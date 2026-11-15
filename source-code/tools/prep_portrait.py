@@ -3,8 +3,13 @@ The person (face, clothing) is never altered beyond a gentle global tone curve."
 import sys, cv2, numpy as np
 from PIL import Image
 
-def portrait(src, out, top, bottom, white_bg=True):
-    im = cv2.imread(src).astype(np.float32)
+def portrait(src, out, top, bottom, white_bg=True, pad_top=0):
+    im = cv2.imread(src)
+    if pad_top:                                                     # more headroom: extend the plain backdrop upwards
+        im = cv2.copyMakeBorder(im, pad_top, 0, 0, 0, cv2.BORDER_CONSTANT, value=(255, 255, 255))
+        top += pad_top; bottom += pad_top
+        top -= pad_top
+    im = im.astype(np.float32)
     H, W = im.shape[:2]
     if white_bg:
         u8 = im.astype(np.uint8)
@@ -58,4 +63,5 @@ def portrait(src, out, top, bottom, white_bg=True):
     print('ok', out)
 
 if __name__ == '__main__':
-    portrait(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), '--keep-bg' not in sys.argv)
+    pad = next((int(a.split('=')[1]) for a in sys.argv if a.startswith('--pad-top=')), 0)
+    portrait(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), '--keep-bg' not in sys.argv, pad)
