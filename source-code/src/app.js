@@ -18,7 +18,11 @@
 
   /* ------------------------------------------------------------ 3D engine */
   let gl3d = null;
-  try { gl3d = window.MJR3D.Engine($('#gl'), { mobile: isMobile(), reduced }); } catch (e) { console.warn(e); }
+  const NAV = navigator, conn = NAV.connection || {};
+  const weak = (NAV.deviceMemory && NAV.deviceMemory <= 4) || (NAV.hardwareConcurrency && NAV.hardwareConcurrency <= 4);
+  const skip3d = conn.saveData || (NAV.deviceMemory && NAV.deviceMemory <= 2);     // data-saver or very low-memory phones: no 3D at all
+  try { if (!skip3d) gl3d = window.MJR3D.Engine($('#gl'), { mobile: isMobile(), reduced, lowPower: weak }); } catch (e) { console.warn(e); }
+  if (gl3d && 'MutationObserver' in window) new MutationObserver(() => gl3d.pause(document.body.classList.contains('locked'))).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   if (!gl3d) { document.documentElement.classList.add('no-gl'); $('#fallback').innerHTML = VIS.lionMark('lm-bg'); }
 
   const PAGES = {
@@ -45,16 +49,16 @@
   const heroLion = $('#heroLion'), lionImg = $('#lionImg');
   let lionPhoto = false;
   const shapeFor = n => n === 'home' ? (lionPhoto ? 'embers' : 'lion') : PAGES[n].shape;
-  if (CFG.HERO_LION && heroLion) {
-    const base = CFG.HERO_LION, uns = base.includes('images.unsplash.com');
-    const u = (w, h) => uns ? `${base}?auto=format&fit=crop&crop=faces,entropy&w=${w}&h=${h}&q=72` : base;
-    lionImg.onload = () => {
+  if (heroLion && lionImg && lionImg.getAttribute('src')) {
+    // the photo is requested straight from the HTML (starts downloading before any script runs)
+    const ok = () => {
+      if (lionPhoto) return;
       lionPhoto = true; heroLion.classList.add('on'); heroLion.parentElement.classList.add('has-photo');
       if (gl3d && current === 'home') gl3d.go('embers', placement('home'), { duration: 1.6 });
     };
+    lionImg.onload = ok;
     lionImg.onerror = () => { heroLion.remove(); };
-    if (uns) { lionImg.sizes = '(max-width: 760px) 100vw, 58vw'; lionImg.srcset = `${u(720, 900)} 720w, ${u(1200, 1300)} 1200w, ${u(1600, 1700)} 1600w`; }
-    lionImg.src = u(1200, 1300);
+    if (lionImg.complete) { if (lionImg.naturalWidth) ok(); else heroLion.remove(); }
   } else if (heroLion) heroLion.remove();
 
   /* ------------------------------------------------------------ text split */
@@ -110,7 +114,10 @@
       el.addEventListener('pointerleave', () => { el.style.transform = ''; });
     });
   }
-  function enhance(root) { observe(root); bindTilt(root); bindMag(root); }
+  function markLoaded(root) { $$('.viz img:not(.ld)', root).forEach(i => { if (i.complete) i.classList.add('ld'); }); }
+  document.addEventListener('load', e => { if (e.target.tagName === 'IMG') e.target.classList.add('ld'); }, true);
+  document.addEventListener('error', e => { if (e.target.tagName === 'IMG') e.target.classList.add('ld'); }, true);
+  function enhance(root) { observe(root); bindTilt(root); bindMag(root); markLoaded(root); }
 
   if (gl3d) addEventListener('pointermove', e => gl3d.pointer(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight * 2 - 1)), { passive: true });
 
@@ -121,11 +128,14 @@
     let tag = '';
     if (img) {
       const alt = `${svc.name} by MJR LION AGENCY`, st = pos ? ` style="object-position:${esc(pos)}"` : '';
+      const sizes = extra === 'v2' ? '(max-width:860px) 92vw, 44vw' : '(max-width:760px) 62vw, (max-width:1100px) 46vw, 30vw';
       tag = /\.(webp|avif|jpe?g|png)(\?|$)/i.test(img)
         ? `<img src="${esc(img)}" alt="${esc(alt)}" loading="lazy" decoding="async"${st}>`
-        : `<img src="${esc(img)}-1600.webp" srcset="${esc(img)}-960.webp 960w, ${esc(img)}-1600.webp 1600w" sizes="(max-width:760px) 100vw, (max-width:1100px) 50vw, 40vw" width="1600" height="901" alt="${esc(alt)}" loading="lazy" decoding="async"${st}>`;
+        : `<img src="${esc(img)}-1600.webp" srcset="${esc(img)}-960.webp 960w, ${esc(img)}-1600.webp 1600w" sizes="${sizes}" width="1600" height="901" alt="${esc(alt)}" loading="lazy" decoding="async"${st}>`;
     }
-    return `<div class="viz ${extra || ''}${img ? ' has-img' : ''}" data-art="${esc(svc.art)}">${img ? tag : `<div class="vz-art">${VIS.ART[svc.icon]}</div><span class="vz-chip">${esc(svc.chip)}</span><span class="vz-slot">Image slot · ${esc(svc.art)}</span>`}<span class="shine"></span></div>`;
+    const lq = img && (CFG.IMAGE_LQIP || {})['svc-' + svc.id];
+    const bg = lq ? ` style="background-image:url(${lq})${pos ? ';background-position:' + esc(pos) : ''}"` : '';
+    return `<div class="viz ${extra || ''}${img ? ' has-img' : ''}"${bg} data-art="${esc(svc.art)}">${img ? tag : `<div class="vz-art">${VIS.ART[svc.icon]}</div><span class="vz-chip">${esc(svc.chip)}</span><span class="vz-slot">Image slot · ${esc(svc.art)}</span>`}<span class="shine"></span></div>`;
   }
   function photo(key, mono, name) {
     const src = CFG.TEAM_PHOTOS[key];
@@ -808,12 +818,19 @@
     if (heroLion && current === 'home' && y < innerHeight * 1.5) heroLion.style.setProperty('--sy', (y * .22).toFixed(1));
     if (gl3d) gl3d.scroll(y, Math.max(current === 'home' ? .3 : .45, 1 - y / (innerHeight * 1.5)));
   }
-  addEventListener('scroll', onScroll, { passive: true });
+  let scrollQueued = false;
+  addEventListener('scroll', () => { if (scrollQueued) return; scrollQueued = true; requestAnimationFrame(() => { scrollQueued = false; onScroll(); }); }, { passive: true });
   addEventListener('resize', () => { if (gl3d && current) gl3d.place(placement(current)); });
+  let px = 0, py = 0, ptrQueued = false;
   if (fine && !reduced && heroLion) addEventListener('pointermove', e => {
-    if (current !== 'home') return;
-    heroLion.style.setProperty('--lx', ((e.clientX / innerWidth - .5) * -18).toFixed(1) + 'px');
-    heroLion.style.setProperty('--ly', ((e.clientY / innerHeight - .5) * -12).toFixed(1) + 'px');
+    px = e.clientX; py = e.clientY;
+    if (ptrQueued || current !== 'home' || !heroLion.isConnected) return;
+    ptrQueued = true;
+    requestAnimationFrame(() => {
+      ptrQueued = false;
+      heroLion.style.setProperty('--lx', ((px / innerWidth - .5) * -18).toFixed(1) + 'px');
+      heroLion.style.setProperty('--ly', ((py / innerHeight - .5) * -12).toFixed(1) + 'px');
+    });
   }, { passive: true });
 
   /* ------------------------------------------------------------ intro */
@@ -836,15 +853,11 @@
   else {
     if (gl3d) gl3d.go('galaxy', { x: 0, y: 0, s: isMobile() ? .55 : .95, o: .85, tilt: 0, spin: .35 }, { duration: 1.4, scatter: .4 });
     requestAnimationFrame(() => setTimeout(() => $('#intro').classList.add('play'), 60));
-    setTimeout(endIntro, 3100);
+    setTimeout(endIntro, 2600);
     addEventListener('keydown', function k(e) { if (e.key === 'Enter' || e.key === ' ') { endIntro(); removeEventListener('keydown', k); } });
   }
-  // pre-build every 3D sculpture in idle time so page switches never stutter
-  if (gl3d) {
-    const queue = ['lion', 'embers', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe'];
-    const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
-    (function next() { if (!queue.length) return; idle(() => { gl3d.prewarm([queue.shift()]); next(); }, { timeout: 2500 }); })();
-  }
+  // build every 3D sculpture in the background worker so page switches never stutter
+  if (gl3d) gl3d.prewarm(['embers', 'lion', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe']);
   enhance($('#ftr'));
   onScroll();
 })();

@@ -4,6 +4,9 @@
    ========================================================================= */
 (function () {
   'use strict';
+  /* All sculpture generation lives in shapeLib(): it runs inside a Web Worker
+     (so building 3D shapes never blocks scrolling), with a main-thread fallback. */
+  function shapeLib() {
   const TAU = Math.PI * 2;
 
   function rng(seed) {
@@ -423,6 +426,19 @@
   }
 
   const SHAPES = { embers: shapeEmbers, lion: shapeLion, galaxy: shapeGalaxy, geodesic: shapeGeodesic, knot: shapeKnot, orbits: shapeOrbits, vault: shapeVault, bars: shapeBars, helix: shapeHelix, globe: shapeGlobe };
+  return { SHAPES, makeDust, sphereDust, Builder, rng, TAU };
+  }
+  const { SHAPES, makeDust, sphereDust, Builder, rng, TAU } = shapeLib();
+
+  let shapeWorker = null;
+  function getWorker() {
+    if (shapeWorker !== null) return shapeWorker;
+    try {
+      const src = 'var lib=(' + shapeLib.toString() + ')();onmessage=function(e){var d=e.data,s=lib.SHAPES[d.name](d.N);postMessage({name:d.name,N:d.N,P:s.P,C:s.C,E:s.E},[s.P.buffer,s.C.buffer,s.E.buffer]);};';
+      shapeWorker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+    } catch (e) { shapeWorker = false; }
+    return shapeWorker;
+  }
 
   /* ------------------------------------------------------------- MATRICES */
   function persp(fovy, aspect, near, far) {
@@ -478,7 +494,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance' });
     if (!gl) return null;
     const mobile = opts.mobile;
-    const N = opts.count || (mobile ? 7000 : 14000);
+    const N = opts.count || Math.round((mobile ? 4800 : 10000) * (opts.lowPower ? .7 : 1));
     const reduced = !!opts.reduced;
 
     function sh(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; } return s; }
@@ -490,8 +506,22 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     ['aFrom', 'aTo', 'aCF', 'aCT', 'aEF', 'aET', 'aR'].forEach(n => A[n] = gl.getAttribLocation(prog, n));
     ['uP', 'uV', 'uM', 'uT', 'uMorph', 'uPx', 'uOpacity', 'uBreath', 'uScatter', 'uWave'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
-    const cache = {};
-    const getShape = name => cache[name] || (cache[name] = SHAPES[name](N));
+    const cache = {}, waiting = {};
+    let pending = null;
+    const W = getWorker();
+    function arrived(name, shp) {
+      cache[name] = shp; delete waiting[name];
+      if (pending && pending.name === name) { const p = pending; pending = null; go(p.name, p.place, p.o); }
+    }
+    if (W) {
+      W.onmessage = e => { const d = e.data; if (d.N === N) arrived(d.name, { P: d.P, C: d.C, E: d.E }); };
+      W.onerror = () => { shapeWorker = false; Object.keys(waiting).forEach(n => arrived(n, SHAPES[n](N))); };
+    }
+    function request(name) {
+      if (cache[name] || waiting[name] || !SHAPES[name]) return;
+      if (shapeWorker) { waiting[name] = 1; shapeWorker.postMessage({ name, N }); }
+      else cache[name] = SHAPES[name](N);
+    }
 
     function sys(n, init) {
       const s = { n, buf: {}, data: {} };
@@ -523,8 +553,8 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       cur: { x: 0, y: 0, s: 1, o: 0, tilt: 0 }, tgt: { x: 0, y: 0, s: 1, o: .9, tilt: 0 },
       spin: 0, spinSpeed: 0, spinTarget: 0, lion: false,
       mx: 0, my: 0, tmx: 0, tmy: 0, scroll: 0, scrollFade: 1, time: 0, scatter: 1,
-      dpr: Math.min(window.devicePixelRatio || 1, mobile ? 1.3 : 1.5), w: 1, h: 1, last: performance.now(), dirty: true,
-      skip: false, lowPower: false, fN: 0, fT: 0
+      dpr: opts.lowPower ? 1 : Math.min(window.devicePixelRatio || 1, mobile ? 1.3 : 1.5), w: 1, h: 1, last: performance.now(), dirty: true,
+      skip: 0, lowPower: !!opts.lowPower, paused: false, fN: 0, fT: 0
     };
 
     function currentBlend() {
@@ -549,9 +579,11 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       if (place) Object.assign(st.tgt, place);
       st.lion = name === 'lion';
       st.spinSpeed = (place && place.spin != null) ? place.spin : (st.lion ? 0 : .14);
-      if (name === st.shape) { st.dirty = true; return; }
+      if (name === st.shape) { pending = null; st.dirty = true; return; }
+      if (!cache[name]) { request(name); pending = { name, place, o }; st.dirty = true; return; }   // morph starts as soon as the worker delivers it
+      pending = null;
       const from = st.shape ? currentBlend() : start;
-      set(main, from, getShape(name));
+      set(main, from, cache[name]);
       st.shape = name;
       st.morph = reduced ? 1 : 0;
       st.morphDur = o.duration || 1.9;
@@ -575,13 +607,15 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
 
     function frame(now) {
       raf = requestAnimationFrame(frame);
-      if (document.hidden) { st.last = now; return; }
-      // save power: half frame-rate when the sculpture is far behind content or the device is slow
-      st.skip = !st.skip;
-      if (st.skip && st.morph >= 1 && (st.lowPower || st.scroll > st.h * 1.3)) return;
+      if (document.hidden || st.paused) { st.last = now; return; }   // nothing to draw: tab hidden or a panel covers the screen
+      // save power: lower frame-rate when the sculpture is far behind content or the device is slow
+      const far = st.scroll > st.h * 1.2;
+      const every = st.morph < 1 ? 1 : (far ? 3 : (st.lowPower ? 2 : 1));
+      st.skip = (st.skip + 1) % every;
+      if (st.skip !== 0) return;
       let dt = Math.min(.05, (now - st.last) / 1000); st.last = now;
       // adaptive quality: measure real frame time once, then drop resolution if needed
-      if (!reduced && st.time > 4 && st.fN < 90 && !(st.lowPower || st.scroll > st.h * 1.3)) {
+      if (!reduced && st.time > 4 && st.fN < 90 && !(st.lowPower || far)) {
         st.fN++; st.fT += dt;
         if (st.fN === 90) {
           const avg = st.fT / 90;
@@ -637,7 +671,8 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       pointer(x, y) { st.tmx = x; st.tmy = y; if (reduced) st.dirty = true; },
       scroll(y, fade) { st.scroll = y; st.scrollFade = fade; st.dirty = true; },
       get state() { return st; },
-      prewarm(names) { names.forEach(n => getShape(n)); }
+      prewarm(names) { names.forEach(request); },
+      pause(v) { st.paused = !!v; }
     };
   }
 

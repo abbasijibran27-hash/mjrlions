@@ -118,3 +118,11 @@ if __name__ == '__main__':
     small.save(out + '-960.webp', 'WEBP', quality=82, method=6)
     big.save(out + '-preview.png')
     print('ok', out)
+
+
+def lqip(webp_path):
+    """24px blurred preview as a data: URI (paste into IMAGE_LQIP in src/data.js)"""
+    import base64, io
+    im = Image.open(webp_path).convert('RGB').resize((24, 14), Image.LANCZOS)
+    b = io.BytesIO(); im.save(b, 'WEBP', quality=45)
+    return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
