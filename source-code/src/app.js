@@ -208,7 +208,7 @@
   }
   function closeOverlays(only) {
     [sheet, $('#adminModal')].filter(Boolean).forEach(o => { if (!only || o === only) o.classList.remove('open'); });
-    if (!$('.sheet.open,.modal.open')) document.body.classList.remove('locked');
+    if (!$('.sheet.open,.modal.open') && !document.body.classList.contains('menu-open')) document.body.classList.remove('locked');
     if (lastFocus && lastFocus.focus && !only) lastFocus.focus({ preventScroll: true });
   }
   document.addEventListener('click', e => {
@@ -218,7 +218,7 @@
     if (ov && !(ov.id === 'modal' && e.target.closest('[data-explore]'))) closeOverlays(ov);
     else if (ov) { ov.classList.remove('open'); }
   });
-  addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlays(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') { closeOverlays(); setMenu(false); } });
 
   /* ------------------------------------------------------------ PRICING */
   $('#priceGrid').innerHTML = PRICING.map((p, i) => `
@@ -734,6 +734,17 @@
   }
 
   /* ------------------------------------------------------------ menu */
+  // mobile / tablet 3-line menu
+  function setMenu(open) {
+    const b = $('#burger');
+    if (!b) return;
+    document.body.classList.toggle('menu-open', open);
+    b.setAttribute('aria-expanded', open); b.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (open) document.body.classList.add('locked'); else if (!$('.sheet.open,.modal.open')) document.body.classList.remove('locked');
+  }
+  $('#burger').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+  $$('#mnav a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  addEventListener('resize', () => { if (window.innerWidth > 959 && document.body.classList.contains('menu-open')) setMenu(false); });
   // keep the active page visible in the one-line menu on small screens
   function revealActiveNav() {
     const nav = $('.nav'), a = $('.nav a.on:not(.btn)');
