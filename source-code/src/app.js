@@ -111,14 +111,6 @@
   }
   function enhance(root) { observe(root); bindTilt(root); bindMag(root); }
 
-  /* ------------------------------------------------------------ cursor */
-  if (fine && !reduced) {
-    const c = $('.cursor'), d = $('.cursor-dot'); let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y;
-    addEventListener('pointermove', e => { x = e.clientX; y = e.clientY; c.classList.add('on'); d.classList.add('on'); d.style.transform = `translate(${x}px,${y}px)`; });
-    document.addEventListener('pointerover', e => c.classList.toggle('hover', !!e.target.closest('a,button,input,select,textarea,.tilt,.o-panel')));
-    document.addEventListener('pointerleave', () => { c.classList.remove('on'); d.classList.remove('on'); });
-    (function loop() { cx += (x - cx) * .18; cy += (y - cy) * .18; c.style.transform = `translate(${cx}px,${cy}px)`; requestAnimationFrame(loop); })();
-  }
   if (gl3d) addEventListener('pointermove', e => gl3d.pointer(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight * 2 - 1)), { passive: true });
 
   /* ------------------------------------------------------------ visuals */
