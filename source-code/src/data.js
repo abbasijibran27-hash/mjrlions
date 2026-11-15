@@ -8,12 +8,12 @@ window.SITE_CONFIG = {
   /* Replaceable photography. Put an image URL (or data: URI) against any key
      and it replaces the art-directed placeholder automatically. */
   IMAGES: {
-    'svc-web-development': 'images/services/web-development-bab85f51', 'svc-social-media-management': 'images/services/social-media-management-2056ed27', 'svc-performance-marketing': 'images/services/performance-marketing-caa2f0d8',
-    'svc-graphic-design': '', 'svc-video-editing': '', 'svc-ai-videos': '', 'svc-ugc-production': '',
+    'svc-web-development': 'images/services/web-development-7e98e1f0', 'svc-social-media-management': 'images/services/social-media-management-2f2a5e09', 'svc-performance-marketing': 'images/services/performance-marketing-538631d5',
+    'svc-graphic-design': 'images/services/graphic-design-9465f248', 'svc-video-editing': '', 'svc-ai-videos': '', 'svc-ugc-production': '',
     'svc-content-writing': '', 'svc-lead-generation': '', 'svc-ai-content-creation': ''
   },
   /* focus point of each photo inside its frame (CSS object-position) */
-  IMAGE_POS: { 'svc-web-development': '70% 50%', 'svc-social-media-management': '66% 45%', 'svc-performance-marketing': { card: '50% 45%', detail: '92% 45%' } },
+  IMAGE_POS: { 'svc-web-development': '70% 50%', 'svc-social-media-management': '66% 45%', 'svc-performance-marketing': { card: '50% 45%', detail: '92% 45%' }, 'svc-graphic-design': { card: '55% 45%', detail: '64% 45%' } },
   TEAM_PHOTOS: { mjr: '', sana: '', roma: '', wasi: '', wahab: '', husnain: '', jamshaid: '' },
   /* MJR showreel — add video URLs (mp4/webm) to play real edits in the profile */
   SHOWREEL: ['', '', '', '', '', ''],

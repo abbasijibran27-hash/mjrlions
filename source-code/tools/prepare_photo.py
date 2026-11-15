@@ -6,7 +6,7 @@ writes <out_base>-1600.webp, <out_base>-960.webp, <out_base>-preview.png
 import sys, cv2, numpy as np
 from PIL import Image
 
-GOLD_H = 20.5      # OpenCV hue (0-180) ≈ 41°, MJR gold #d6b26e
+GOLD_H = 19.0      # OpenCV hue (0-180) ≈ 38°, MJR gold #d6b26e
 
 
 def clean_watermark_1(img):
@@ -45,8 +45,8 @@ def brand_recolour(img, center=89, width=10, region=None):
     w = cv2.GaussianBlur(w, (0, 0), 1.0)[..., None]
     bright = np.clip((v - 60) / 110, 0, 1)                 # dark teal -> charcoal, bright teal -> gold
     rec = hsv.copy()
-    rec[..., 0] = GOLD_H
-    rec[..., 1] = s * (.18 + .52 * bright)
+    rec[..., 0] = 14.5 + (GOLD_H - 14.5) * bright         # darker gold leans bronze (never olive)
+    rec[..., 1] = s * (.20 + .55 * bright)
     rec[..., 2] = v * (.92 + .10 * bright)
     rec = cv2.cvtColor(np.clip(rec, 0, 255).astype(np.uint8), cv2.COLOR_HSV2BGR).astype(np.float32)
     out = img.astype(np.float32) * (1 - w) + rec * w
@@ -87,7 +87,17 @@ if __name__ == '__main__':
     for a in sys.argv:                                     # --region=x0,y0,x1,y1,hue  (extra teal-blue spots)
         if a.startswith('--region='):
             x0, y0, x1, y1, hc = [int(v) for v in a.split('=')[1].split(',')]
-            img = brand_recolour(img, center=hc, width=7, region=(x0, y0, x1, y1))
+            img = brand_recolour(img, center=hc, width=9, region=(x0, y0, x1, y1))
+    for a in sys.argv:                                     # --warm=x0,y0,x1,y1  (olive-looking pastels -> warm gold)
+        if a.startswith('--warm='):
+            x0, y0, x1, y1 = [int(v) for v in a.split('=')[1].split(',')]
+            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.float32)
+            box = np.zeros(hsv.shape[:2], np.float32); box[y0:y1, x0:x1] = 1
+            box = cv2.GaussianBlur(box, (0, 0), 8)
+            olive = np.exp(-((hsv[..., 0] - 26) / 8) ** 2) * np.clip((hsv[..., 1] - 15) / 30, 0, 1) * box
+            hsv[..., 0] = hsv[..., 0] * (1 - olive) + 16 * olive
+            hsv[..., 1] = np.minimum(255, hsv[..., 1] * (1 + .35 * olive))
+            img = cv2.cvtColor(np.clip(hsv, 0, 255).astype(np.uint8), cv2.COLOR_HSV2BGR)
     f = grade(img)
     big, small = finish(f, 1600, 3.0, .45, 7), finish(f, 960, 2.4, .35, 8)
     big.save(out + '-1600.webp', 'WEBP', quality=84, method=6)
