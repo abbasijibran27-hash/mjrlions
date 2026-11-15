@@ -30,14 +30,19 @@ def clean_watermark_1(img):
     return out
 
 
-def brand_recolour(img):
+def brand_recolour(img, center=89, width=10, region=None):
     """turn teal / cyan UI colours into MJR gold on near-black; leave wood, plants, food, blue icons alone.
     Blending happens in RGB (not hue) so partial pixels never pass through green."""
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.float32)
     h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
-    hue_w = np.exp(-((h - 89) / 10) ** 2)                  # teal / cyan band
+    hue_w = np.exp(-((h - center) / width) ** 2)           # teal / cyan band
     sat_w = np.clip((s - 15) / 45, 0, 1)                   # ignore neutral greys
-    w = cv2.GaussianBlur(hue_w * sat_w, (0, 0), 1.0)[..., None]
+    w = hue_w * sat_w
+    if region:                                             # optional: only inside a feathered box
+        x0, y0, x1, y1 = region
+        box = np.zeros(w.shape, np.float32); box[y0:y1, x0:x1] = 1
+        w = w * cv2.GaussianBlur(box, (0, 0), 8)
+    w = cv2.GaussianBlur(w, (0, 0), 1.0)[..., None]
     bright = np.clip((v - 60) / 110, 0, 1)                 # dark teal -> charcoal, bright teal -> gold
     rec = hsv.copy()
     rec[..., 0] = GOLD_H
@@ -79,6 +84,10 @@ if __name__ == '__main__':
     img = cv2.imread(src)
     if '--clean-wm1' in sys.argv: img = clean_watermark_1(img)
     img = brand_recolour(img)
+    for a in sys.argv:                                     # --region=x0,y0,x1,y1,hue  (extra teal-blue spots)
+        if a.startswith('--region='):
+            x0, y0, x1, y1, hc = [int(v) for v in a.split('=')[1].split(',')]
+            img = brand_recolour(img, center=hc, width=7, region=(x0, y0, x1, y1))
     f = grade(img)
     big, small = finish(f, 1600, 3.0, .45, 7), finish(f, 960, 2.4, .35, 8)
     big.save(out + '-1600.webp', 'WEBP', quality=84, method=6)

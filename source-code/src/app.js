@@ -116,7 +116,8 @@
 
   /* ------------------------------------------------------------ visuals */
   function viz(svc, extra) {
-    const img = CFG.IMAGES['svc-' + svc.id], pos = (CFG.IMAGE_POS || {})['svc-' + svc.id];
+    const img = CFG.IMAGES['svc-' + svc.id], P = (CFG.IMAGE_POS || {})['svc-' + svc.id];
+    const pos = P && typeof P === 'object' ? (extra === 'v2' ? P.detail : P.card) : P;   // separate focus for card vs detail view
     let tag = '';
     if (img) {
       const alt = `${svc.name} by MJR LION AGENCY`, st = pos ? ` style="object-position:${esc(pos)}"` : '';
