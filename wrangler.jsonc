@@ -6,5 +6,10 @@
   "assets": {
     "directory": "./website",
     "binding": "ASSETS"
-  }
+  },
+  // Storage for the Updates page (posts, photos, admins).
+  // Wrangler creates this KV namespace automatically on the first deploy.
+  "kv_namespaces": [
+    { "binding": "UPDATES" }
+  ]
 }

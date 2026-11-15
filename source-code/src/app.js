@@ -24,9 +24,8 @@
   const PAGES = {
     home: { shape: 'lion', title: 'MJR LION AGENCY — Premium Digital Agency | Your Success Our Pride' },
     services: { shape: 'geodesic', title: 'Services — MJR LION AGENCY', tilt: .25 },
-    works: { shape: 'knot', title: 'Works / Portfolio — MJR LION AGENCY', tilt: .3 },
-    studio: { shape: 'orbits', title: 'Studio — MJR LION AGENCY', tilt: .35 },
     team: { shape: 'vault', title: 'Meet Our Team — Verification — MJR LION AGENCY', tilt: .1 },
+    updates: { shape: 'knot', title: 'Updates — MJR LION AGENCY', tilt: .3 },
     pricing: { shape: 'bars', title: 'Pricing — MJR LION AGENCY', tilt: .22 },
     track: { shape: 'helix', title: 'Track Your Project — MJR LION AGENCY', tilt: .12 },
     contact: { shape: 'globe', title: 'Contact Us — MJR LION AGENCY', tilt: .35 }
@@ -226,7 +225,7 @@
     setTimeout(() => $('.sheet-close', sheetPanel).focus({ preventScroll: true }), 50);
   }
   function closeOverlays(only) {
-    [sheet, $('#modal')].forEach(o => { if (!only || o === only) o.classList.remove('open'); });
+    [sheet, $('#adminModal')].filter(Boolean).forEach(o => { if (!only || o === only) o.classList.remove('open'); });
     if (!$('.sheet.open,.modal.open') && !document.body.classList.contains('menu-open')) document.body.classList.remove('locked');
     if (lastFocus && lastFocus.focus && !only) lastFocus.focus({ preventScroll: true });
   }
@@ -238,55 +237,6 @@
     else if (ov) { ov.classList.remove('open'); }
   });
   addEventListener('keydown', e => { if (e.key === 'Escape') { closeOverlays(); setMenu(false); } });
-
-  /* ------------------------------------------------------------ WORKS */
-  const cats = ['All'].concat([...new Set(WORKS.map(w => w.cat))]);
-  $('#filters').innerHTML = cats.map((c, i) => `<button type="button" role="tab" class="${i ? '' : 'on'}" aria-selected="${!i}" data-f="${esc(c)}">${esc(c)}</button>`).join('');
-  $('#wkGrid').innerHTML = WORKS.map((w, i) => { const s = SVC[w.svc]; return `
-    <article class="wk-card${w.wide ? ' wide' : ''}" data-cat="${esc(w.cat)}" data-r style="--d:${(i % 3) * .07}s">
-      ${viz(s, i % 2 ? 'v2' : '')}
-      <div class="body"><div class="svc">${esc(s.name)}</div><h3>${esc(w.client)}</h3><div class="out">${esc(w.out)}</div>
-      <div class="foot"><button class="link-arrow" type="button" data-case="${i}">View Case Study <i></i></button><span class="tag" style="font:600 10px/1 var(--fl);letter-spacing:.2em;color:var(--dim)">${String(i + 1).padStart(2, '0')}</span></div></div>
-    </article>`; }).join('');
-  $('#filters').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    $$('#filters button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
-    const f = b.dataset.f, cards = $$('.wk-card');
-    cards.forEach(c => { if (f !== 'All' && c.dataset.cat !== f) { c.classList.add('hide'); setTimeout(() => c.classList.contains('hide') && c.classList.add('gone'), 450); } });
-    let k = 0;
-    cards.forEach(c => { if (f === 'All' || c.dataset.cat === f) { c.classList.remove('gone'); c.classList.add('in'); const d = k++ * 60; setTimeout(() => c.classList.remove('hide'), 30 + d); } });
-  });
-  document.addEventListener('click', e => { const b = e.target.closest('[data-case]'); if (b) openCase(+b.dataset.case); });
-  function openCase(i) {
-    const w = WORKS[i], s = SVC[w.svc]; lastFocus = document.activeElement;
-    $('#modalPanel').innerHTML = `
-      <button class="sheet-close" type="button" data-close aria-label="Close"></button>
-      ${viz(s, 'v2').replace('class="viz', 'style="aspect-ratio:21/9;border-radius:0" class="viz')}
-      <div class="cs-body">
-        <div><div class="label">${esc(s.name)} · Case study</div><h2 class="h-lg" style="margin-top:12px">${esc(w.client)}</h2><p class="lead" style="margin-top:14px">${esc(w.out)}</p></div>
-        <div class="wins">${w.wins.map(t => `<div class="win">${esc(t)}</div>`).join('')}</div>
-        <div class="cs-grid">
-          <div class="cs-box"><h4 class="label">Our process</h4><ol class="steps" style="grid-template-columns:1fr 1fr">${s.process.map(p => `<li>${esc(p)}</li>`).join('')}</ol></div>
-          <div class="cs-box"><h4 class="label">Stack</h4><div class="techs">${s.tech.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div><h4 class="label" style="margin-top:22px">Timeline</h4><p class="muted">${esc(s.timeline)}</p></div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn btn-gold" href="#contact" data-svc="${s.id}" data-close>Start a Similar Project <span class="arr">→</span></a><button class="btn btn-ghost" type="button" data-close data-explore="${s.id}">Explore ${esc(s.name)}</button></div>
-      </div>`;
-    $('#modal').classList.add('open'); document.body.classList.add('locked');
-    setTimeout(() => $('#modalPanel .sheet-close').focus({ preventScroll: true }), 50);
-  }
-
-  /* ------------------------------------------------------------ STUDIO */
-  $('#teamGrid').innerHTML = TEAM.map((m, i) => `
-    <article class="tm-card tilt${m.founder ? ' founder' : ''}" data-r style="--d:${(i % 4) * .07}s">
-      <div class="z1" style="${m.founder ? 'flex:0 0 46%;display:flex' : ''}">${photo(m.key, m.mono, m.name).replace('class="photo"', `class="photo" style="${m.founder ? 'flex:1;aspect-ratio:auto;min-height:320px' : ''}"`)}</div>
-      <div class="body z2">
-        <div class="dept">${esc(m.dept)}</div>
-        <h3>${esc(m.name)}${m.title ? ` <span class="muted" style="font-weight:400">— ${esc(m.title)}</span>` : ''}</h3>
-        <div class="role">${esc(m.role)}</div>
-        <p>${esc(m.desc)}</p>
-        <div class="foot"><a href="#team" class="link-arrow" data-member="${esc(m.name)}">View Profile <i></i></a></div>
-      </div>
-    </article>`).join('');
 
   /* ------------------------------------------------------------ PRICING */
   $('#priceGrid').innerHTML = PRICING.map((p, i) => `
@@ -455,6 +405,201 @@
     setTimeout(() => el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }), 120);
   }
 
+  /* ------------------------------------------------------------ UPDATES (feed + admin) */
+  const UT = { offer: 'Offer', merger: 'Merger & Partnership', news: 'News', update: 'Update', alert: 'Important' };
+  const US = { token: null, me: null, posts: [], f: 'all', loaded: false, at: 0, img: null, checked: false };
+  try { US.token = localStorage.getItem('mjr-admin') || null; } catch (e) { }
+  const feedEl = $('#feed'), compEl = $('#composer'), adminPanel = $('#adminPanel'), adminModal = $('#adminModal');
+  async function uapi(path, method, body) {
+    const h = {};
+    if (body) h['content-type'] = 'application/json';
+    if (US.token) h.authorization = 'Bearer ' + US.token;
+    let r;
+    try { r = await fetch(path, { method: method || 'GET', headers: h, body: body ? JSON.stringify(body) : undefined }); } catch (e) { return { status: 0, data: {} }; }
+    if (!(r.headers.get('content-type') || '').includes('application/json')) return { status: 0, data: {} };
+    let data = {}; try { data = await r.json(); } catch (e) { }
+    return { status: r.status, data };
+  }
+  const ERR = { rate_limited: 'Too many attempts. Please wait 10 minutes.', invalid: 'Username or password is incorrect.', not_configured: 'Secure server is being set up. Please try again shortly.', storage_not_configured: 'Updates storage is being set up. Please try again shortly.', image: 'This photo format is not supported.', image_too_large: 'Photo is too large. Please choose a smaller one.', too_large: 'Photo is too large. Please choose a smaller one.', empty: 'Write something or add a photo first.', weak: 'New password must be at least 10 characters.', name: 'Please enter the member’s name.', limit: 'Admin limit reached (25).', forbidden: 'Only the owner can do this.' };
+  const errText = r => r.status === 0 ? 'Can’t reach the server. Check your connection and try again.' : (ERR[r.data.error] || 'Something went wrong. Please try again.');
+  const ago = ms => {
+    const s = (Date.now() - ms) / 1000;
+    if (s < 60) return 'Just now'; if (s < 3600) return Math.floor(s / 60) + 'm ago'; if (s < 86400) return Math.floor(s / 3600) + 'h ago'; if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+    return new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+  const linkify = t => esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, '<a href="$1" target="_blank" rel="noopener nofollow">$1</a>');
+  const ICO_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
+  const ICO_DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>';
+  function postHTML(p) {
+    return `<article class="post glass" data-id="${esc(p.id)}">
+      <header class="post-h"><div class="post-av">${VIS.lionMark('pa-' + esc(p.id))}</div>
+        <div><div class="post-au">MJR LION AGENCY <i title="Official">✓</i></div><div class="post-meta">${esc(p.author || 'MJR LION')}${p.atitle ? ' · ' + esc(p.atitle) : ''} · <time datetime="${new Date(p.at).toISOString()}">${ago(p.at)}</time></div></div>
+        <span class="post-tag t-${esc(p.type)}">${esc(UT[p.type] || 'Update')}</span></header>
+      ${p.title ? `<h3>${esc(p.title)}</h3>` : ''}
+      ${p.body ? `<div class="post-body">${linkify(p.body)}</div>` : ''}
+      ${p.img ? `<div class="post-img"><img src="/api/media/${esc(p.img)}" alt="${esc(p.title || UT[p.type] || 'Update')}" loading="lazy" decoding="async"${p.w && p.h ? ` width="${+p.w}" height="${+p.h}"` : ''}></div>` : ''}
+      <footer class="post-f"><button type="button" data-share="${esc(p.id)}">${ICO_SHARE}Share</button>${US.me ? `<button type="button" class="del" data-del="${esc(p.id)}">${ICO_DEL}Delete</button>` : ''}</footer>
+    </article>`;
+  }
+  function renderFilters() {
+    $('#uFilters').innerHTML = [['all', 'All']].concat(Object.entries(UT)).map(([k, v]) => `<button type="button" role="tab" class="${US.f === k ? 'on' : ''}" aria-selected="${US.f === k}" data-uf="${k}">${esc(v)}</button>`).join('');
+  }
+  function renderFeed() {
+    if (!US.loaded) { feedEl.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+    const list = US.posts.filter(p => US.f === 'all' || p.type === US.f);
+    feedEl.innerHTML = list.length ? list.map(postHTML).join('') :
+      `<div class="feed-empty glass"><b>${US.posts.length ? 'Nothing in this category yet.' : 'No updates yet.'}</b>New offers, partnerships and announcements will appear here.</div>`;
+  }
+  function renderComposer() {
+    if (!US.me) { compEl.innerHTML = ''; $('#adminBtn').textContent = 'Admin Login'; return; }
+    $('#adminBtn').textContent = 'Admin Panel';
+    compEl.innerHTML = `<form class="composer glass" id="cmForm" novalidate>
+      <div class="cm-top"><div class="post-av">${VIS.lionMark('pa-me')}</div><div><b>${esc(US.me.name)}</b><small>${esc(US.me.role === 'owner' ? 'Owner' : (US.me.title || 'Admin'))} · posting as MJR LION AGENCY</small></div>
+        <div class="cm-act"><button class="btn btn-ghost btn-sm" type="button" data-admin-open>Admin Panel</button></div></div>
+      <div class="cm-row"><label class="sr" for="cmType">Category</label><select class="fi" id="cmType">${Object.entries(UT).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('')}</select>
+        <label class="sr" for="cmTitle">Title</label><input class="fi" id="cmTitle" maxlength="140" placeholder="Headline (optional)"></div>
+      <label class="sr" for="cmBody">Post</label><textarea class="fi" id="cmBody" maxlength="5000" placeholder="Share an offer, partnership, merger or announcement…"></textarea>
+      <div id="cmPrev"></div>
+      <div class="cm-bar"><label class="btn btn-ghost btn-sm file-btn">Add Photo<input type="file" id="cmFile" accept="image/*"></label><span class="cm-msg" id="cmMsg"></span><button class="btn btn-gold btn-sm" type="submit" id="cmPost">Post Update <span class="arr">→</span></button></div>
+    </form>`;
+    $('#cmFile').onchange = async e => {
+      const f = e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      const msg = $('#cmMsg'); msg.className = 'cm-msg'; msg.textContent = 'Preparing photo…';
+      try { US.img = await shrink(f); $('#cmPrev').innerHTML = `<div class="cm-prev"><img src="${US.img.data}" alt="Selected photo"><button type="button" id="cmRm" aria-label="Remove photo">×</button></div>`; $('#cmRm').onclick = () => { US.img = null; $('#cmPrev').innerHTML = ''; }; msg.textContent = ''; }
+      catch (err) { msg.className = 'cm-msg err'; msg.textContent = 'Couldn’t read this photo. Try a JPG or PNG.'; }
+    };
+    $('#cmForm').onsubmit = async e => {
+      e.preventDefault();
+      const msg = $('#cmMsg'), btn = $('#cmPost');
+      const body = { type: $('#cmType').value, title: $('#cmTitle').value.trim(), body: $('#cmBody').value.trim() };
+      if (US.img) Object.assign(body, { image: US.img.data, w: US.img.w, h: US.img.h });
+      if (!body.title && !body.body && !body.image) { msg.className = 'cm-msg err'; msg.textContent = ERR.empty; return; }
+      btn.disabled = true; msg.className = 'cm-msg'; msg.textContent = 'Posting…';
+      const r = await uapi('/api/posts', 'POST', body);
+      btn.disabled = false;
+      if (r.status === 401) return logout(true);
+      if (!r.data.ok) { msg.className = 'cm-msg err'; msg.textContent = errText(r); return; }
+      US.posts.unshift(r.data.post); US.img = null; renderComposer(); renderFeed(); toast('Update posted');
+    };
+  }
+  function shrink(file) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.round(im.naturalWidth * k), h = Math.round(im.naturalHeight * k);
+        const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        let data = c.toDataURL('image/webp', .82);
+        if (!data.startsWith('data:image/webp')) data = c.toDataURL('image/jpeg', .85);
+        res({ data, w, h });
+      };
+      im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('img')); };
+      im.src = url;
+    });
+  }
+  async function loadUpdates(force) {
+    renderFilters();
+    if (!US.checked && US.token) { US.checked = true; const r = await uapi('/api/admin/me'); if (r.data.ok) US.me = r.data.me; else if (r.status === 401) logout(false); }
+    renderComposer();
+    if (!force && US.loaded && Date.now() - US.at < 30000) return renderFeed();
+    if (!US.loaded) renderFeed();
+    const r = await uapi('/api/posts');
+    US.loaded = true; US.at = Date.now();
+    if (r.data.ok) { US.posts = r.data.posts || []; renderFeed(); }
+    else feedEl.innerHTML = `<div class="feed-empty glass"><b>Updates couldn’t load.</b>${esc(errText(r))}</div>`;
+  }
+  function logout(expired) {
+    US.token = null; US.me = null; try { localStorage.removeItem('mjr-admin'); } catch (e) { }
+    renderComposer(); renderFeed(); if (expired) toast('Session expired. Please log in again.');
+    if (adminModal.classList.contains('open')) renderAdmin();
+  }
+  $('#uFilters').addEventListener('click', e => { const b = e.target.closest('[data-uf]'); if (!b) return; US.f = b.dataset.uf; renderFilters(); renderFeed(); });
+  feedEl.addEventListener('click', async e => {
+    const sh = e.target.closest('[data-share]');
+    if (sh) {
+      const p = US.posts.find(x => x.id === sh.dataset.share), url = location.origin + location.pathname + '#updates';
+      try { if (navigator.share) { await navigator.share({ title: (p && p.title) || 'MJR LION AGENCY — Update', text: p ? (p.title || p.body || '').slice(0, 140) : '', url }); return; } } catch (err) { if (err && err.name === 'AbortError') return; }
+      try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (err) { toast(url); }
+      return;
+    }
+    const d = e.target.closest('[data-del]');
+    if (d) {
+      if (!d.classList.contains('arm')) { d.classList.add('arm'); d.lastChild.textContent = 'Confirm delete'; setTimeout(() => { if (d.isConnected) { d.classList.remove('arm'); d.lastChild.textContent = 'Delete'; } }, 4000); return; }
+      d.disabled = true;
+      const r = await uapi('/api/posts/' + encodeURIComponent(d.dataset.del), 'DELETE');
+      if (r.status === 401) return logout(true);
+      if (r.data.ok) { US.posts = US.posts.filter(x => x.id !== d.dataset.del); renderFeed(); toast('Post deleted'); }
+      else { d.disabled = false; toast(errText(r)); }
+    }
+  });
+
+  // admin panel (login · manage admins · change password)
+  function openAdmin() { lastFocus = document.activeElement; renderAdmin(); adminModal.classList.add('open'); document.body.classList.add('locked'); setTimeout(() => { const f = $('input', adminPanel); f && f.focus({ preventScroll: true }); }, 80); }
+  $('#adminBtn').addEventListener('click', openAdmin);
+  document.addEventListener('click', e => { if (e.target.closest('[data-admin-open]')) openAdmin(); });
+  async function renderAdmin() {
+    const close = '<button class="sheet-close" type="button" data-close aria-label="Close"></button>';
+    if (!US.me) {
+      adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">Updates · Admin</div><h3>Log in to post updates</h3><p class="muted" style="font-size:14px">Only the MJR LION owner and admins approved by the owner can post.</p>
+        <form id="lgForm" autocomplete="on"><label class="sr" for="lgU">Username</label><input class="fi" id="lgU" autocomplete="username" placeholder="Username" autocapitalize="none" spellcheck="false">
+        <label class="sr" for="lgP">Password</label><input class="fi" id="lgP" type="password" autocomplete="current-password" placeholder="Password">
+        <button class="btn btn-gold" type="submit">Log In</button><div class="v-msg" id="lgMsg" role="status"></div></form></div>`;
+      $('#lgForm').onsubmit = async e => {
+        e.preventDefault();
+        const m = $('#lgMsg'); m.className = 'v-msg'; m.textContent = 'Checking…';
+        const r = await uapi('/api/admin/login', 'POST', { username: $('#lgU').value.trim(), password: $('#lgP').value });
+        if (!r.data.ok) { m.className = 'v-msg err'; m.textContent = errText(r); return; }
+        US.token = r.data.token; US.me = r.data.me; US.checked = true; try { localStorage.setItem('mjr-admin', US.token); } catch (err) { }
+        renderComposer(); renderFeed(); renderAdmin(); toast('Welcome, ' + US.me.name);
+      };
+      return;
+    }
+    const owner = US.me.role === 'owner';
+    adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">${owner ? 'Owner' : 'Admin'} panel</div><h3>${esc(US.me.name)}</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-gold btn-sm" type="button" data-close>Write a Post</button><button class="btn btn-ghost btn-sm" type="button" id="lgOut">Log Out</button></div>
+      ${owner ? `<hr><div class="label">Admins who can post</div><div class="ad-list" id="adList"><div class="muted" style="font-size:14px">Loading…</div></div>
+        <form id="adForm"><div class="cm-row" style="grid-template-columns:1fr 1fr"><label class="sr" for="adN">Name</label><input class="fi" id="adN" placeholder="Member name" maxlength="60"><label class="sr" for="adT">Role</label><input class="fi" id="adT" placeholder="Role, e.g. Marketing Manager" maxlength="60"></div>
+        <button class="btn btn-ghost btn-sm" type="submit">Make Admin</button><div id="adMsg"></div></form>` : ''}
+      <hr><div class="label">Change password</div>
+      <form id="pwForm"><label class="sr" for="pwC">Current password</label><input class="fi" id="pwC" type="password" autocomplete="current-password" placeholder="Current password">
+      <label class="sr" for="pwN">New password</label><input class="fi" id="pwN" type="password" autocomplete="new-password" placeholder="New password (10+ characters)">
+      <button class="btn btn-ghost btn-sm" type="submit">Update Password</button><div class="v-msg" id="pwMsg" role="status"></div></form></div>`;
+    $('#lgOut').onclick = () => { logout(false); closeOverlays(adminModal); toast('Logged out'); };
+    $('#pwForm').onsubmit = async e => {
+      e.preventDefault();
+      const m = $('#pwMsg'); m.className = 'v-msg'; m.textContent = 'Saving…';
+      const r = await uapi('/api/admin/password', 'POST', { current: $('#pwC').value, next: $('#pwN').value });
+      if (r.status === 401 && r.data.error === 'unauthorized') return logout(true);
+      m.className = 'v-msg ' + (r.data.ok ? 'ok' : 'err'); m.textContent = r.data.ok ? 'Password updated.' : (r.data.error === 'invalid' ? 'Current password is incorrect.' : errText(r));
+      if (r.data.ok) { $('#pwC').value = ''; $('#pwN').value = ''; }
+    };
+    if (!owner) return;
+    const list = async () => {
+      const r = await uapi('/api/admin/users');
+      if (r.status === 401) return logout(true);
+      const el = $('#adList'); if (!el) return;
+      el.innerHTML = r.data.ok ? (r.data.admins.length ? r.data.admins.map(a => `<div class="ad-item"><div><b>${esc(a.name)}</b><small>${esc(a.title || 'Admin')} · username: ${esc(a.u)}</small></div><button type="button" data-rm="${esc(a.u)}">Remove</button></div>`).join('') : '<div class="muted" style="font-size:14px">No admins yet. Only you can post.</div>') : `<div class="cm-msg err">${esc(errText(r))}</div>`;
+    };
+    list();
+    $('#adList').onclick = async e => {
+      const b = e.target.closest('[data-rm]'); if (!b) return;
+      if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = 'Confirm'; return; }
+      const r = await uapi('/api/admin/users/' + encodeURIComponent(b.dataset.rm), 'DELETE');
+      if (r.data.ok) { toast('Admin removed'); list(); } else toast(errText(r));
+    };
+    $('#adForm').onsubmit = async e => {
+      e.preventDefault();
+      const m = $('#adMsg');
+      const r = await uapi('/api/admin/users', 'POST', { name: $('#adN').value.trim(), title: $('#adT').value.trim() });
+      if (!r.data.ok) { m.innerHTML = `<div class="cm-msg err">${esc(errText(r))}</div>`; return; }
+      const cred = `Username: ${r.data.admin.u}\nPassword: ${r.data.password}`;
+      m.innerHTML = `<div class="cred"><b>${esc(r.data.admin.name)}</b> is now an admin. Share these login details privately — the password is shown only once.<br>Username: <code>${esc(r.data.admin.u)}</code><br>Password: <code>${esc(r.data.password)}</code><br><button class="btn btn-ghost btn-sm" type="button" id="adCopy" style="margin-top:8px">Copy Details</button></div>`;
+      $('#adCopy').onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(cred) : Promise.reject()).then(() => toast('Copied'), () => toast('Select the details to copy them')); };
+      $('#adN').value = ''; $('#adT').value = ''; list();
+    };
+  }
+
   /* ------------------------------------------------------------ menu */
   function setMenu(open) { document.body.classList.toggle('menu-open', open); $('#burger').setAttribute('aria-expanded', open); $('#burger').setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); document.body.classList.toggle('locked', open); }
   $('#burger').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
@@ -486,6 +631,7 @@
     } else show();
   }
   function afterRoute() {
+    if (current === 'updates') loadUpdates();
     if (pendingScroll && current === 'contact') { const id = pendingScroll; pendingScroll = null; setTimeout(() => $('#' + id).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }), 500); }
     if (pendingMember && current === 'team') { const m = pendingMember; pendingMember = null; const msg = $('#vMsg'); msg.className = 'v-msg'; msg.textContent = `Enter ${m}’s verification code to view the full verified profile.`; setTimeout(() => $('#vCode').focus({ preventScroll: true }), 700); }
   }
@@ -538,7 +684,7 @@
   }
   // pre-build every 3D sculpture in idle time so page switches never stutter
   if (gl3d) {
-    const queue = ['lion', 'embers', 'geodesic', 'knot', 'orbits', 'vault', 'bars', 'helix', 'globe'];
+    const queue = ['lion', 'embers', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe'];
     const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
     (function next() { if (!queue.length) return; idle(() => { gl3d.prewarm([queue.shift()]); next(); }, { timeout: 2500 }); })();
   }

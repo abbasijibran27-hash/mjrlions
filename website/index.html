@@ -559,6 +559,75 @@ main{position:relative;z-index:2;overflow-x:clip}
 .ms li small{display:block;color:var(--dim);font-size:12px}
 .notes-box{padding:18px 20px;border-radius:16px;border:1px solid rgba(214,178,110,.3);background:rgba(214,178,110,.06);color:#e9e2d2;font-size:14.5px}
 
+/* ---------- UPDATES */
+.feed-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}
+.feed-main{min-width:0;max-width:760px}
+.feed-side{position:sticky;top:100px;display:grid;gap:16px}
+.side-box{padding:22px;display:grid;gap:12px;justify-items:start}
+.side-box p{font-size:14px;color:var(--muted)}
+.feed{display:grid;gap:18px}
+.post{padding:22px 24px;border-radius:22px}
+.post-h{display:flex;align-items:center;gap:12px}
+.post-av{width:46px;height:46px;flex-shrink:0;border-radius:50%;background:#0b0b0d;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.post-av svg{width:40px;height:40px}
+.post-av .glow,.post-av .shine{animation:none}
+.post-au{font:600 15px/1.2 var(--fh);display:flex;align-items:center;gap:7px}
+.post-au i{width:16px;height:16px;border-radius:50%;background:linear-gradient(120deg,#c9a253,#f1d9a0);color:#120c04;font:700 10px/16px var(--fb);text-align:center;font-style:normal}
+.post-meta{font-size:12.5px;color:var(--dim);margin-top:3px}
+.post-tag{margin-left:auto;padding:.5em .9em;border-radius:999px;font:700 9.5px/1 var(--fl);letter-spacing:.16em;text-transform:uppercase;border:1px solid;white-space:nowrap}
+.t-offer{color:#f1d9a0;border-color:rgba(214,178,110,.45);background:rgba(214,178,110,.1)}
+.t-merger{color:#9fb2ff;border-color:rgba(53,87,232,.45);background:rgba(53,87,232,.12)}
+.t-news{color:#e9e3d7;border-color:var(--line3);background:rgba(255,255,255,.04)}
+.t-update{color:#7fd3a0;border-color:rgba(127,211,160,.4);background:rgba(127,211,160,.08)}
+.t-alert{color:#f19a7c;border-color:rgba(241,154,124,.45);background:rgba(241,154,124,.1)}
+.post h3{font:600 1.25rem/1.3 var(--fh);margin-top:16px;letter-spacing:-.01em;text-wrap:balance}
+.post-body{margin-top:10px;color:#ddd7cb;font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.post-body a{color:var(--gold2);text-decoration:underline;text-underline-offset:3px}
+.post-img{margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:#0b0b0d}
+.post-img img{width:100%;height:auto;max-height:680px;object-fit:cover}
+.post-f{display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2)}
+.post-f button{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;font:600 10.5px/1 var(--fl);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:background .3s,color .3s}
+.post-f button:hover{background:rgba(255,255,255,.05);color:var(--gold2)}
+.post-f button svg{width:15px;height:15px}
+.post-f .del{margin-left:auto;color:#e38a6c}
+.post-f .del.arm{background:rgba(227,138,108,.14);color:#ffb39a}
+.feed-empty{padding:44px 24px;text-align:center;color:var(--muted);border-radius:22px}
+.feed-empty b{display:block;font:600 1.15rem/1.3 var(--fh);color:var(--text);margin-bottom:6px}
+.sk{height:180px;border-radius:22px;background:linear-gradient(100deg,rgba(255,255,255,.03) 30%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.03) 70%);background-size:300% 100%;animation:skel 1.4s linear infinite}
+@keyframes skel{to{background-position:-300% 0}}
+.composer{padding:20px 22px;border-radius:22px;margin-bottom:22px;display:grid;gap:12px;border-color:rgba(214,178,110,.35)}
+.cm-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cm-top b{font:600 15px/1.2 var(--fh)}
+.cm-top small{display:block;color:var(--gold);font:600 9.5px/1.5 var(--fl);letter-spacing:.2em;text-transform:uppercase}
+.cm-act{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.cm-row{display:grid;grid-template-columns:210px 1fr;gap:10px}
+.fi{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line3);background:rgba(0,0,0,.4);outline:none;font-size:15px;color:#f1ece2;transition:border-color .3s,box-shadow .3s}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(214,178,110,.1)}
+select.fi{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+select.fi option{background:#111}
+textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
+.cm-prev{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line2)}
+.cm-prev img{width:100%;max-height:340px;object-fit:cover}
+.cm-prev button{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:18px;line-height:1}
+.cm-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.cm-msg{font-size:13px;color:var(--muted)}
+.cm-msg.err{color:#f19a7c}
+.file-btn{position:relative;cursor:pointer}
+.file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.admin-panel{width:min(580px,100%)}
+.admin-body{padding:clamp(24px,4vw,40px);display:grid;gap:16px}
+.admin-body h3{font:600 1.5rem/1.2 var(--fh)}
+.admin-body form{display:grid;gap:10px}
+.admin-body hr{border:0;border-top:1px solid var(--line2);margin:6px 0}
+.cred{padding:16px 18px;border-radius:14px;border:1px solid rgba(127,211,160,.4);background:rgba(127,211,160,.06);font-size:14px;line-height:1.8}
+.cred code{font:600 14px/1 var(--fl);color:var(--gold2);letter-spacing:.06em}
+.ad-list{display:grid;gap:8px}
+.ad-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--line2)}
+.ad-item div{flex:1;min-width:0}
+.ad-item small{display:block;color:var(--dim);font-size:12.5px}
+.ad-item button{color:#e38a6c;font:600 10.5px/1 var(--fl);letter-spacing:.14em;text-transform:uppercase;padding:8px 10px;border-radius:8px}
+.ad-item button:hover{background:rgba(227,138,108,.12)}
+
 /* ---------- CONTACT */
 .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .c-card{padding:28px;border-radius:22px;display:grid;gap:12px;align-content:start;background:linear-gradient(180deg,rgba(24,23,21,.86),rgba(10,10,12,.92));border:1px solid var(--line2)}
@@ -616,6 +685,9 @@ main{position:relative;z-index:2;overflow-x:clip}
   .pf-grid{grid-template-columns:1fr}
   .pf-side{position:relative;top:0;display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center}
   .dash-grid{grid-template-columns:1fr}
+  .feed-wrap{grid-template-columns:1fr}
+  .feed-main{max-width:none}
+  .feed-side{position:relative;top:0;grid-template-columns:1fr 1fr;order:-1}
   .form-wrap{grid-template-columns:1fr}
 }
 @media (max-width:860px){
@@ -662,6 +734,11 @@ main{position:relative;z-index:2;overflow-x:clip}
   .stages{grid-template-columns:repeat(3,1fr);row-gap:22px}
   .stage:nth-child(3)::after{display:none}
   .reel{grid-template-columns:1fr}
+  .feed-side{grid-template-columns:1fr}
+  .feed-side .side-box:last-child{display:none}
+  .cm-row{grid-template-columns:1fr}
+  .post{padding:18px}
+  .post-tag{font-size:8.5px;letter-spacing:.1em}
   .o-panel{width:220px;height:300px;left:-110px;top:-150px}
   .ftr-top{grid-template-columns:1fr}
   .filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;margin-left:calc(var(--pad)*-1);margin-right:calc(var(--pad)*-1);padding-left:var(--pad);padding-right:var(--pad);scrollbar-width:none}
@@ -707,12 +784,11 @@ main{position:relative;z-index:2;overflow-x:clip}
     <a href="#home" class="brand" aria-label="MJR LION AGENCY — Home"><span id="logoMark"></span><span class="brand-t"><b>MJR LION</b><span>AGENCY</span></span></a>
     <nav class="nav" aria-label="Primary">
       <a href="#home" data-nav="home">Home</a>
-      <a href="#services" data-nav="services">Services</a>
-      <a href="#works" data-nav="works">Works</a>
-      <a href="#studio" data-nav="studio">Studio</a>
-      <a href="#team" data-nav="team">Team Member</a>
-      <a href="#contact" data-nav="contact">Contact Us</a>
+      <a href="#services" data-nav="services">Our Services</a>
       <a href="#pricing" data-nav="pricing">Pricing</a>
+      <a href="#team" data-nav="team">Team Member</a>
+      <a href="#updates" data-nav="updates">Updates</a>
+      <a href="#contact" data-nav="contact">Contact Us</a>
       <a href="#track" data-nav="track" class="btn btn-gold btn-sm" data-mag>Track Project</a>
     </nav>
     <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false"><i></i><i></i><i></i></button>
@@ -720,13 +796,12 @@ main{position:relative;z-index:2;overflow-x:clip}
 </header>
 <div class="mnav" id="mnav" aria-label="Mobile">
   <a href="#home" data-nav="home" style="--i:0"><small>01</small>Home</a>
-  <a href="#services" data-nav="services" style="--i:1"><small>02</small>Services</a>
-  <a href="#works" data-nav="works" style="--i:2"><small>03</small>Works</a>
-  <a href="#studio" data-nav="studio" style="--i:3"><small>04</small>Studio</a>
-  <a href="#team" data-nav="team" style="--i:4"><small>05</small>Team Member</a>
+  <a href="#services" data-nav="services" style="--i:1"><small>02</small>Our Services</a>
+  <a href="#pricing" data-nav="pricing" style="--i:2"><small>03</small>Pricing</a>
+  <a href="#team" data-nav="team" style="--i:3"><small>04</small>Team Member</a>
+  <a href="#updates" data-nav="updates" style="--i:4"><small>05</small>Updates</a>
   <a href="#contact" data-nav="contact" style="--i:5"><small>06</small>Contact Us</a>
-  <a href="#pricing" data-nav="pricing" style="--i:6"><small>07</small>Pricing</a>
-  <a href="#track" data-nav="track" style="--i:7"><small>08</small>Track Project</a>
+  <a href="#track" data-nav="track" style="--i:6"><small>07</small>Track Project</a>
   <div class="m-foot">MJR LION AGENCY — Your Success Our Pride</div>
 </div>
 
@@ -747,7 +822,7 @@ main{position:relative;z-index:2;overflow-x:clip}
         <p class="lead" data-r style="--d:.55s">MJR LION helps ambitious businesses grow through premium websites, branding, AI-powered marketing, content creation and performance-driven digital strategies.</p>
         <div class="hero-ctas" data-r style="--d:.65s">
           <a href="#services" class="btn btn-gold" data-mag>Start Your Project <span class="arr">→</span></a>
-          <a href="#works" class="btn btn-ghost" data-mag>View Portfolio</a>
+          <a href="#pricing" class="btn btn-ghost" data-mag>View Pricing</a>
         </div>
       </div>
     </div>
@@ -784,9 +859,9 @@ main{position:relative;z-index:2;overflow-x:clip}
   <section class="sec" style="padding-top:clamp(40px,6vw,80px)">
     <div class="wrap why">
       <div data-r>
-        <div class="label" style="margin-bottom:22px">The studio</div>
+        <div class="label" style="margin-bottom:22px">Who we are</div>
         <blockquote>MJR LION is a lean, senior team of designers, engineers, marketers and AI specialists. <em>No juniors on your account. No agency middlemen.</em> Just craft, speed, and outcomes worth talking about.</blockquote>
-        <div style="margin-top:34px;display:flex;gap:14px;flex-wrap:wrap"><a class="btn btn-ghost" href="#studio" data-mag>Meet the Studio</a><a class="link-arrow" href="#team" style="align-self:center">Verify a team member <i></i></a></div>
+        <div style="margin-top:34px;display:flex;gap:14px;flex-wrap:wrap"><a class="btn btn-ghost" href="#team" data-mag>Meet Our Team</a><a class="link-arrow" href="#services" style="align-self:center">Explore our services <i></i></a></div>
       </div>
       <div class="why-list">
         <div class="why-item glass" data-r style="--d:.05s"><b>01</b><div><h4>We are premium.</h4><p>Cinematic craft and editorial design in every deliverable.</p></div></div>
@@ -809,47 +884,6 @@ main{position:relative;z-index:2;overflow-x:clip}
     </div>
   </div>
   <section class="sec" style="padding-top:20px"><div class="wrap"><div class="svc-grid" id="svcGrid"></div></div></section>
-</section>
-
-<!-- ============ WORKS ============ -->
-<section class="page" id="page-works" data-page="works" aria-label="Works">
-  <div class="page-hero">
-    <div class="wrap">
-      <div class="crumb label">Works / Portfolio</div>
-      <h1 class="h-xl split">Cinematic case studies, <span class="gold">measurable outcomes.</span></h1>
-    </div>
-  </div>
-  <section class="sec" style="padding-top:10px">
-    <div class="wrap">
-      <div class="filters" id="filters" role="tablist" aria-label="Filter projects"></div>
-      <div class="wk-grid" id="wkGrid"></div>
-    </div>
-  </section>
-</section>
-
-<!-- ============ STUDIO ============ -->
-<section class="page" id="page-studio" data-page="studio" aria-label="Studio">
-  <div class="page-hero">
-    <div class="wrap">
-      <div class="crumb label">Studio</div>
-      <p class="studio-msg split">MJR LION is a lean, senior team of designers, engineers, marketers and AI specialists. <span class="gold">No juniors on your account. No agency middlemen.</span> Just craft, speed, and outcomes worth talking about.</p>
-      <div class="values">
-        <div class="value" data-r style="--d:0s"><b class="gold">Power.</b><p>Bold, premium creative that makes brands impossible to ignore.</p></div>
-        <div class="value" data-r style="--d:.08s"><b class="gold">Precision.</b><p>Every pixel, frame and campaign engineered with intent.</p></div>
-        <div class="value" data-r style="--d:.16s"><b class="gold">Leadership.</b><p>Senior specialists who own your outcomes end-to-end.</p></div>
-        <div class="value" data-r style="--d:.24s"><b class="gold">Confidence.</b><p>Clear process, honest reporting, results worth talking about.</p></div>
-      </div>
-    </div>
-  </div>
-  <section class="sec" style="padding-top:20px">
-    <div class="wrap">
-      <div class="sec-head">
-        <div class="label">The team</div>
-        <h2 class="h-lg split">Seven specialists. <span class="gold">One standard.</span></h2>
-      </div>
-      <div class="team-grid" id="teamGrid"></div>
-    </div>
-  </section>
 </section>
 
 <!-- ============ TEAM MEMBER VERIFICATION ============ -->
@@ -948,6 +982,38 @@ main{position:relative;z-index:2;overflow-x:clip}
   </section>
 </section>
 
+<!-- ============ UPDATES ============ -->
+<section class="page" id="page-updates" data-page="updates" aria-label="Updates">
+  <div class="page-hero">
+    <div class="wrap">
+      <div class="crumb label">Updates</div>
+      <h1 class="h-xl split">Latest from <span class="gold">MJR LION.</span></h1>
+      <p class="lead" data-r style="--d:.3s">Offers, partnerships, mergers and important announcements, shared directly by the MJR LION team.</p>
+    </div>
+  </div>
+  <section class="sec" style="padding-top:0">
+    <div class="wrap feed-wrap">
+      <div class="feed-main">
+        <div id="composer"></div>
+        <div class="filters" id="uFilters" role="tablist" aria-label="Filter updates"></div>
+        <div class="feed" id="feed" aria-live="polite"></div>
+      </div>
+      <aside class="feed-side">
+        <div class="side-box glass">
+          <div class="label">Official channel</div>
+          <p>Every post here is published by the MJR LION owner or an authorised MJR admin.</p>
+          <button class="btn btn-ghost btn-sm" type="button" id="adminBtn">Admin Login</button>
+        </div>
+        <div class="side-box glass">
+          <div class="label">Questions about an offer?</div>
+          <p>Talk to our team about any update, offer or partnership.</p>
+          <a class="link-arrow" href="#contact">Contact us <i></i></a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</section>
+
 <!-- ============ CONTACT ============ -->
 <section class="page" id="page-contact" data-page="contact" aria-label="Contact us">
   <div class="page-hero">
@@ -994,8 +1060,8 @@ main{position:relative;z-index:2;overflow-x:clip}
     <div class="ftr-top">
       <div class="ftr-brand"><span id="ftrMark"></span><h3>MJR LION AGENCY</h3><p>Your Success Our Pride</p></div>
       <div><h4>Navigate</h4><nav aria-label="Footer">
-        <a href="#home">Home</a><a href="#services">Services</a><a href="#works">Works</a><a href="#studio">Studio</a>
-        <a href="#team">Team Member</a><a href="#pricing">Pricing</a><a href="#track">Track Project</a><a href="#contact">Contact Us</a>
+        <a href="#home">Home</a><a href="#services">Our Services</a><a href="#pricing">Pricing</a><a href="#team">Team Member</a>
+        <a href="#updates">Updates</a><a href="#contact">Contact Us</a><a href="#track">Track Project</a>
       </nav></div>
       <div><h4>Reach us</h4><div class="cl" id="ftrContact"></div></div>
     </div>
@@ -1006,8 +1072,8 @@ main{position:relative;z-index:2;overflow-x:clip}
 
 <!-- service detail sheet -->
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Service details"><div class="sheet-bg" data-close></div><div class="sheet-panel" id="sheetPanel"></div></div>
-<!-- case study modal -->
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Case study"><div class="sheet-bg" data-close></div><div class="modal-panel" id="modalPanel"></div></div>
+<!-- admin panel (Updates) -->
+<div class="modal" id="adminModal" role="dialog" aria-modal="true" aria-label="Admin"><div class="sheet-bg" data-close></div><div class="modal-panel admin-panel" id="adminPanel"></div></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>/* =========================================================================
@@ -1194,30 +1260,6 @@ window.SERVICES.forEach(s => {
   const inc = `Everything listed under Features — ${s.features.join(', ').replace(/, ([^,]*)$/, ' and $1')}. ` + (s.price ? `${s.price}.` : 'Pricing is scoped per content sprint — tell us your volume and channels and we will quote.');
   s.faqs = faq(FAQ_NAME[s.id], HOW_LONG[s.id], inc, s.tech.slice(0, 4).join(', '));
 });
-
-window.WORKS = [
-  { client: 'Northline Labs', svc: 'web-development', cat: 'Web Development', out: 'Traffic +212% within 90 days. Conversion rate lifted 3.4x post-launch.', wins: ['Traffic +212% within 90 days', 'Conversion rate lifted 3.4x post-launch', 'Core Web Vitals: 98/100 across pages'], wide: true },
-  { client: 'Halcyon Beauty', svc: 'social-media-management', cat: 'Social Media', out: '0 → 84k followers in 6 months at a 7.2% average engagement rate.', wins: ['Grew 0 → 84k followers in 6 months', 'Engagement rate averages 7.2%'] },
-  { client: 'Vantage Ventures', svc: 'performance-marketing', cat: 'Performance Marketing', out: '6.4x ROAS at scale.', wins: ['6.4x ROAS at scale', 'Paid Ads management'] },
-  { client: 'Halcyon Beauty', svc: 'performance-marketing', cat: 'Performance Marketing', out: 'CAC reduced 41%.', wins: ['CAC reduced 41%'] },
-  { client: 'Meridian Group', svc: 'graphic-design', cat: 'Graphic Design', out: 'Full rebrand delivered in 4 weeks.', wins: ['Full rebrand delivered in 4 weeks'] },
-  { client: 'Vantage — Launch Film', svc: 'video-editing', cat: 'Video Editing', out: 'Launch video drove an 8-figure pipeline.', wins: ['Vantage launch video drove 8-figure pipeline'], wide: true },
-  { client: 'SaaS Launch', svc: 'ai-videos', cat: 'AI Videos', out: '128 creative variants in a single week.', wins: ['Ran 128 creative variants in a single week for a SaaS launch'] },
-  { client: 'DTC Brand — Creator Ads', svc: 'ugc-production', cat: 'UGC', out: '3.1x CTR uplift vs. produced ads.', wins: ['3.1x CTR uplift vs. produced ads for a DTC brand'] },
-  { client: 'Aurora', svc: 'content-writing', cat: 'Content Writing', out: '+240% organic traffic within 6 months.', wins: ['+240% organic traffic for Aurora within 6 months'] },
-  { client: 'B2B Pipeline Engine', svc: 'lead-generation', cat: 'Lead Generation', out: '340 SQLs generated in 60 days.', wins: ['Generated 340 SQLs in 60 days for a B2B client'] },
-  { client: 'DTC Brand — Content Engine', svc: 'ai-content-creation', cat: 'AI Content Creation', out: '90 days of content produced in one sprint.', wins: ['Produced 90 days of content in one sprint for a DTC brand'], wide: true }
-];
-
-window.TEAM = [
-  { key: 'mjr', name: 'MJR', title: 'Founder', role: 'Video Editor, UGC Video Production', dept: 'Founder · Video Production', mono: 'MJR', desc: 'Founder of MJR LION. Video editor and motion graphics specialist — cinematic edits, colour grading and UGC video production.', founder: true },
-  { key: 'sana', name: 'Ms. Sana Salahuddin', role: 'AI Video Content Creator', dept: 'AI Department', mono: 'SS', desc: 'AI video and AI-driven creative — from AI video production to automation across multiple domains.' },
-  { key: 'roma', name: 'Ms. Roma', role: 'Web Developer', dept: 'Web Development', mono: 'R', desc: 'Builds modern, responsive and visually engaging websites that are fast, user-friendly and on-brand.' },
-  { key: 'wasi', name: 'Mr. Wasi Mughal', role: 'Marketing Manager', dept: 'Marketing', mono: 'WM', desc: 'Meta, TikTok and Google ad campaigns — from research and testing through optimization and scaling.' },
-  { key: 'wahab', name: 'Mr. Wahab Haider', role: 'Graphic Designer', dept: 'Graphic Design', mono: 'WH', desc: 'Brand identity, social, campaign and print design — professional, creative visuals for growing brands.' },
-  { key: 'husnain', name: 'Mr. Husnain Abbasi', role: 'Social Media Manager', dept: 'Social Media', mono: 'HA', desc: '4+ years managing digital presence for brands, real estate companies and well-known personalities.' },
-  { key: 'jamshaid', name: 'Mr. Jamshaid Abbasi', role: 'Content Writer', dept: 'Content Writing', mono: 'JA', desc: 'Turns ideas, emotions and perspectives into compelling narratives that leave a lasting impression.' }
-];
 
 window.PRICING = [
   { name: 'Video Editing', d: 'Per project · cinematic color, sound and motion', p: '$120–$200', svc: 'video-editing' },
@@ -2071,9 +2113,8 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
   const PAGES = {
     home: { shape: 'lion', title: 'MJR LION AGENCY — Premium Digital Agency | Your Success Our Pride' },
     services: { shape: 'geodesic', title: 'Services — MJR LION AGENCY', tilt: .25 },
-    works: { shape: 'knot', title: 'Works / Portfolio — MJR LION AGENCY', tilt: .3 },
-    studio: { shape: 'orbits', title: 'Studio — MJR LION AGENCY', tilt: .35 },
     team: { shape: 'vault', title: 'Meet Our Team — Verification — MJR LION AGENCY', tilt: .1 },
+    updates: { shape: 'knot', title: 'Updates — MJR LION AGENCY', tilt: .3 },
     pricing: { shape: 'bars', title: 'Pricing — MJR LION AGENCY', tilt: .22 },
     track: { shape: 'helix', title: 'Track Your Project — MJR LION AGENCY', tilt: .12 },
     contact: { shape: 'globe', title: 'Contact Us — MJR LION AGENCY', tilt: .35 }
@@ -2273,7 +2314,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     setTimeout(() => $('.sheet-close', sheetPanel).focus({ preventScroll: true }), 50);
   }
   function closeOverlays(only) {
-    [sheet, $('#modal')].forEach(o => { if (!only || o === only) o.classList.remove('open'); });
+    [sheet, $('#adminModal')].filter(Boolean).forEach(o => { if (!only || o === only) o.classList.remove('open'); });
     if (!$('.sheet.open,.modal.open') && !document.body.classList.contains('menu-open')) document.body.classList.remove('locked');
     if (lastFocus && lastFocus.focus && !only) lastFocus.focus({ preventScroll: true });
   }
@@ -2285,55 +2326,6 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     else if (ov) { ov.classList.remove('open'); }
   });
   addEventListener('keydown', e => { if (e.key === 'Escape') { closeOverlays(); setMenu(false); } });
-
-  /* ------------------------------------------------------------ WORKS */
-  const cats = ['All'].concat([...new Set(WORKS.map(w => w.cat))]);
-  $('#filters').innerHTML = cats.map((c, i) => `<button type="button" role="tab" class="${i ? '' : 'on'}" aria-selected="${!i}" data-f="${esc(c)}">${esc(c)}</button>`).join('');
-  $('#wkGrid').innerHTML = WORKS.map((w, i) => { const s = SVC[w.svc]; return `
-    <article class="wk-card${w.wide ? ' wide' : ''}" data-cat="${esc(w.cat)}" data-r style="--d:${(i % 3) * .07}s">
-      ${viz(s, i % 2 ? 'v2' : '')}
-      <div class="body"><div class="svc">${esc(s.name)}</div><h3>${esc(w.client)}</h3><div class="out">${esc(w.out)}</div>
-      <div class="foot"><button class="link-arrow" type="button" data-case="${i}">View Case Study <i></i></button><span class="tag" style="font:600 10px/1 var(--fl);letter-spacing:.2em;color:var(--dim)">${String(i + 1).padStart(2, '0')}</span></div></div>
-    </article>`; }).join('');
-  $('#filters').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    $$('#filters button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
-    const f = b.dataset.f, cards = $$('.wk-card');
-    cards.forEach(c => { if (f !== 'All' && c.dataset.cat !== f) { c.classList.add('hide'); setTimeout(() => c.classList.contains('hide') && c.classList.add('gone'), 450); } });
-    let k = 0;
-    cards.forEach(c => { if (f === 'All' || c.dataset.cat === f) { c.classList.remove('gone'); c.classList.add('in'); const d = k++ * 60; setTimeout(() => c.classList.remove('hide'), 30 + d); } });
-  });
-  document.addEventListener('click', e => { const b = e.target.closest('[data-case]'); if (b) openCase(+b.dataset.case); });
-  function openCase(i) {
-    const w = WORKS[i], s = SVC[w.svc]; lastFocus = document.activeElement;
-    $('#modalPanel').innerHTML = `
-      <button class="sheet-close" type="button" data-close aria-label="Close"></button>
-      ${viz(s, 'v2').replace('class="viz', 'style="aspect-ratio:21/9;border-radius:0" class="viz')}
-      <div class="cs-body">
-        <div><div class="label">${esc(s.name)} · Case study</div><h2 class="h-lg" style="margin-top:12px">${esc(w.client)}</h2><p class="lead" style="margin-top:14px">${esc(w.out)}</p></div>
-        <div class="wins">${w.wins.map(t => `<div class="win">${esc(t)}</div>`).join('')}</div>
-        <div class="cs-grid">
-          <div class="cs-box"><h4 class="label">Our process</h4><ol class="steps" style="grid-template-columns:1fr 1fr">${s.process.map(p => `<li>${esc(p)}</li>`).join('')}</ol></div>
-          <div class="cs-box"><h4 class="label">Stack</h4><div class="techs">${s.tech.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div><h4 class="label" style="margin-top:22px">Timeline</h4><p class="muted">${esc(s.timeline)}</p></div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn btn-gold" href="#contact" data-svc="${s.id}" data-close>Start a Similar Project <span class="arr">→</span></a><button class="btn btn-ghost" type="button" data-close data-explore="${s.id}">Explore ${esc(s.name)}</button></div>
-      </div>`;
-    $('#modal').classList.add('open'); document.body.classList.add('locked');
-    setTimeout(() => $('#modalPanel .sheet-close').focus({ preventScroll: true }), 50);
-  }
-
-  /* ------------------------------------------------------------ STUDIO */
-  $('#teamGrid').innerHTML = TEAM.map((m, i) => `
-    <article class="tm-card tilt${m.founder ? ' founder' : ''}" data-r style="--d:${(i % 4) * .07}s">
-      <div class="z1" style="${m.founder ? 'flex:0 0 46%;display:flex' : ''}">${photo(m.key, m.mono, m.name).replace('class="photo"', `class="photo" style="${m.founder ? 'flex:1;aspect-ratio:auto;min-height:320px' : ''}"`)}</div>
-      <div class="body z2">
-        <div class="dept">${esc(m.dept)}</div>
-        <h3>${esc(m.name)}${m.title ? ` <span class="muted" style="font-weight:400">— ${esc(m.title)}</span>` : ''}</h3>
-        <div class="role">${esc(m.role)}</div>
-        <p>${esc(m.desc)}</p>
-        <div class="foot"><a href="#team" class="link-arrow" data-member="${esc(m.name)}">View Profile <i></i></a></div>
-      </div>
-    </article>`).join('');
 
   /* ------------------------------------------------------------ PRICING */
   $('#priceGrid').innerHTML = PRICING.map((p, i) => `
@@ -2502,6 +2494,201 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     setTimeout(() => el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }), 120);
   }
 
+  /* ------------------------------------------------------------ UPDATES (feed + admin) */
+  const UT = { offer: 'Offer', merger: 'Merger & Partnership', news: 'News', update: 'Update', alert: 'Important' };
+  const US = { token: null, me: null, posts: [], f: 'all', loaded: false, at: 0, img: null, checked: false };
+  try { US.token = localStorage.getItem('mjr-admin') || null; } catch (e) { }
+  const feedEl = $('#feed'), compEl = $('#composer'), adminPanel = $('#adminPanel'), adminModal = $('#adminModal');
+  async function uapi(path, method, body) {
+    const h = {};
+    if (body) h['content-type'] = 'application/json';
+    if (US.token) h.authorization = 'Bearer ' + US.token;
+    let r;
+    try { r = await fetch(path, { method: method || 'GET', headers: h, body: body ? JSON.stringify(body) : undefined }); } catch (e) { return { status: 0, data: {} }; }
+    if (!(r.headers.get('content-type') || '').includes('application/json')) return { status: 0, data: {} };
+    let data = {}; try { data = await r.json(); } catch (e) { }
+    return { status: r.status, data };
+  }
+  const ERR = { rate_limited: 'Too many attempts. Please wait 10 minutes.', invalid: 'Username or password is incorrect.', not_configured: 'Secure server is being set up. Please try again shortly.', storage_not_configured: 'Updates storage is being set up. Please try again shortly.', image: 'This photo format is not supported.', image_too_large: 'Photo is too large. Please choose a smaller one.', too_large: 'Photo is too large. Please choose a smaller one.', empty: 'Write something or add a photo first.', weak: 'New password must be at least 10 characters.', name: 'Please enter the member’s name.', limit: 'Admin limit reached (25).', forbidden: 'Only the owner can do this.' };
+  const errText = r => r.status === 0 ? 'Can’t reach the server. Check your connection and try again.' : (ERR[r.data.error] || 'Something went wrong. Please try again.');
+  const ago = ms => {
+    const s = (Date.now() - ms) / 1000;
+    if (s < 60) return 'Just now'; if (s < 3600) return Math.floor(s / 60) + 'm ago'; if (s < 86400) return Math.floor(s / 3600) + 'h ago'; if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+    return new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+  const linkify = t => esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, '<a href="$1" target="_blank" rel="noopener nofollow">$1</a>');
+  const ICO_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
+  const ICO_DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>';
+  function postHTML(p) {
+    return `<article class="post glass" data-id="${esc(p.id)}">
+      <header class="post-h"><div class="post-av">${VIS.lionMark('pa-' + esc(p.id))}</div>
+        <div><div class="post-au">MJR LION AGENCY <i title="Official">✓</i></div><div class="post-meta">${esc(p.author || 'MJR LION')}${p.atitle ? ' · ' + esc(p.atitle) : ''} · <time datetime="${new Date(p.at).toISOString()}">${ago(p.at)}</time></div></div>
+        <span class="post-tag t-${esc(p.type)}">${esc(UT[p.type] || 'Update')}</span></header>
+      ${p.title ? `<h3>${esc(p.title)}</h3>` : ''}
+      ${p.body ? `<div class="post-body">${linkify(p.body)}</div>` : ''}
+      ${p.img ? `<div class="post-img"><img src="/api/media/${esc(p.img)}" alt="${esc(p.title || UT[p.type] || 'Update')}" loading="lazy" decoding="async"${p.w && p.h ? ` width="${+p.w}" height="${+p.h}"` : ''}></div>` : ''}
+      <footer class="post-f"><button type="button" data-share="${esc(p.id)}">${ICO_SHARE}Share</button>${US.me ? `<button type="button" class="del" data-del="${esc(p.id)}">${ICO_DEL}Delete</button>` : ''}</footer>
+    </article>`;
+  }
+  function renderFilters() {
+    $('#uFilters').innerHTML = [['all', 'All']].concat(Object.entries(UT)).map(([k, v]) => `<button type="button" role="tab" class="${US.f === k ? 'on' : ''}" aria-selected="${US.f === k}" data-uf="${k}">${esc(v)}</button>`).join('');
+  }
+  function renderFeed() {
+    if (!US.loaded) { feedEl.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+    const list = US.posts.filter(p => US.f === 'all' || p.type === US.f);
+    feedEl.innerHTML = list.length ? list.map(postHTML).join('') :
+      `<div class="feed-empty glass"><b>${US.posts.length ? 'Nothing in this category yet.' : 'No updates yet.'}</b>New offers, partnerships and announcements will appear here.</div>`;
+  }
+  function renderComposer() {
+    if (!US.me) { compEl.innerHTML = ''; $('#adminBtn').textContent = 'Admin Login'; return; }
+    $('#adminBtn').textContent = 'Admin Panel';
+    compEl.innerHTML = `<form class="composer glass" id="cmForm" novalidate>
+      <div class="cm-top"><div class="post-av">${VIS.lionMark('pa-me')}</div><div><b>${esc(US.me.name)}</b><small>${esc(US.me.role === 'owner' ? 'Owner' : (US.me.title || 'Admin'))} · posting as MJR LION AGENCY</small></div>
+        <div class="cm-act"><button class="btn btn-ghost btn-sm" type="button" data-admin-open>Admin Panel</button></div></div>
+      <div class="cm-row"><label class="sr" for="cmType">Category</label><select class="fi" id="cmType">${Object.entries(UT).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('')}</select>
+        <label class="sr" for="cmTitle">Title</label><input class="fi" id="cmTitle" maxlength="140" placeholder="Headline (optional)"></div>
+      <label class="sr" for="cmBody">Post</label><textarea class="fi" id="cmBody" maxlength="5000" placeholder="Share an offer, partnership, merger or announcement…"></textarea>
+      <div id="cmPrev"></div>
+      <div class="cm-bar"><label class="btn btn-ghost btn-sm file-btn">Add Photo<input type="file" id="cmFile" accept="image/*"></label><span class="cm-msg" id="cmMsg"></span><button class="btn btn-gold btn-sm" type="submit" id="cmPost">Post Update <span class="arr">→</span></button></div>
+    </form>`;
+    $('#cmFile').onchange = async e => {
+      const f = e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      const msg = $('#cmMsg'); msg.className = 'cm-msg'; msg.textContent = 'Preparing photo…';
+      try { US.img = await shrink(f); $('#cmPrev').innerHTML = `<div class="cm-prev"><img src="${US.img.data}" alt="Selected photo"><button type="button" id="cmRm" aria-label="Remove photo">×</button></div>`; $('#cmRm').onclick = () => { US.img = null; $('#cmPrev').innerHTML = ''; }; msg.textContent = ''; }
+      catch (err) { msg.className = 'cm-msg err'; msg.textContent = 'Couldn’t read this photo. Try a JPG or PNG.'; }
+    };
+    $('#cmForm').onsubmit = async e => {
+      e.preventDefault();
+      const msg = $('#cmMsg'), btn = $('#cmPost');
+      const body = { type: $('#cmType').value, title: $('#cmTitle').value.trim(), body: $('#cmBody').value.trim() };
+      if (US.img) Object.assign(body, { image: US.img.data, w: US.img.w, h: US.img.h });
+      if (!body.title && !body.body && !body.image) { msg.className = 'cm-msg err'; msg.textContent = ERR.empty; return; }
+      btn.disabled = true; msg.className = 'cm-msg'; msg.textContent = 'Posting…';
+      const r = await uapi('/api/posts', 'POST', body);
+      btn.disabled = false;
+      if (r.status === 401) return logout(true);
+      if (!r.data.ok) { msg.className = 'cm-msg err'; msg.textContent = errText(r); return; }
+      US.posts.unshift(r.data.post); US.img = null; renderComposer(); renderFeed(); toast('Update posted');
+    };
+  }
+  function shrink(file) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.round(im.naturalWidth * k), h = Math.round(im.naturalHeight * k);
+        const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        let data = c.toDataURL('image/webp', .82);
+        if (!data.startsWith('data:image/webp')) data = c.toDataURL('image/jpeg', .85);
+        res({ data, w, h });
+      };
+      im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('img')); };
+      im.src = url;
+    });
+  }
+  async function loadUpdates(force) {
+    renderFilters();
+    if (!US.checked && US.token) { US.checked = true; const r = await uapi('/api/admin/me'); if (r.data.ok) US.me = r.data.me; else if (r.status === 401) logout(false); }
+    renderComposer();
+    if (!force && US.loaded && Date.now() - US.at < 30000) return renderFeed();
+    if (!US.loaded) renderFeed();
+    const r = await uapi('/api/posts');
+    US.loaded = true; US.at = Date.now();
+    if (r.data.ok) { US.posts = r.data.posts || []; renderFeed(); }
+    else feedEl.innerHTML = `<div class="feed-empty glass"><b>Updates couldn’t load.</b>${esc(errText(r))}</div>`;
+  }
+  function logout(expired) {
+    US.token = null; US.me = null; try { localStorage.removeItem('mjr-admin'); } catch (e) { }
+    renderComposer(); renderFeed(); if (expired) toast('Session expired. Please log in again.');
+    if (adminModal.classList.contains('open')) renderAdmin();
+  }
+  $('#uFilters').addEventListener('click', e => { const b = e.target.closest('[data-uf]'); if (!b) return; US.f = b.dataset.uf; renderFilters(); renderFeed(); });
+  feedEl.addEventListener('click', async e => {
+    const sh = e.target.closest('[data-share]');
+    if (sh) {
+      const p = US.posts.find(x => x.id === sh.dataset.share), url = location.origin + location.pathname + '#updates';
+      try { if (navigator.share) { await navigator.share({ title: (p && p.title) || 'MJR LION AGENCY — Update', text: p ? (p.title || p.body || '').slice(0, 140) : '', url }); return; } } catch (err) { if (err && err.name === 'AbortError') return; }
+      try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (err) { toast(url); }
+      return;
+    }
+    const d = e.target.closest('[data-del]');
+    if (d) {
+      if (!d.classList.contains('arm')) { d.classList.add('arm'); d.lastChild.textContent = 'Confirm delete'; setTimeout(() => { if (d.isConnected) { d.classList.remove('arm'); d.lastChild.textContent = 'Delete'; } }, 4000); return; }
+      d.disabled = true;
+      const r = await uapi('/api/posts/' + encodeURIComponent(d.dataset.del), 'DELETE');
+      if (r.status === 401) return logout(true);
+      if (r.data.ok) { US.posts = US.posts.filter(x => x.id !== d.dataset.del); renderFeed(); toast('Post deleted'); }
+      else { d.disabled = false; toast(errText(r)); }
+    }
+  });
+
+  // admin panel (login · manage admins · change password)
+  function openAdmin() { lastFocus = document.activeElement; renderAdmin(); adminModal.classList.add('open'); document.body.classList.add('locked'); setTimeout(() => { const f = $('input', adminPanel); f && f.focus({ preventScroll: true }); }, 80); }
+  $('#adminBtn').addEventListener('click', openAdmin);
+  document.addEventListener('click', e => { if (e.target.closest('[data-admin-open]')) openAdmin(); });
+  async function renderAdmin() {
+    const close = '<button class="sheet-close" type="button" data-close aria-label="Close"></button>';
+    if (!US.me) {
+      adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">Updates · Admin</div><h3>Log in to post updates</h3><p class="muted" style="font-size:14px">Only the MJR LION owner and admins approved by the owner can post.</p>
+        <form id="lgForm" autocomplete="on"><label class="sr" for="lgU">Username</label><input class="fi" id="lgU" autocomplete="username" placeholder="Username" autocapitalize="none" spellcheck="false">
+        <label class="sr" for="lgP">Password</label><input class="fi" id="lgP" type="password" autocomplete="current-password" placeholder="Password">
+        <button class="btn btn-gold" type="submit">Log In</button><div class="v-msg" id="lgMsg" role="status"></div></form></div>`;
+      $('#lgForm').onsubmit = async e => {
+        e.preventDefault();
+        const m = $('#lgMsg'); m.className = 'v-msg'; m.textContent = 'Checking…';
+        const r = await uapi('/api/admin/login', 'POST', { username: $('#lgU').value.trim(), password: $('#lgP').value });
+        if (!r.data.ok) { m.className = 'v-msg err'; m.textContent = errText(r); return; }
+        US.token = r.data.token; US.me = r.data.me; US.checked = true; try { localStorage.setItem('mjr-admin', US.token); } catch (err) { }
+        renderComposer(); renderFeed(); renderAdmin(); toast('Welcome, ' + US.me.name);
+      };
+      return;
+    }
+    const owner = US.me.role === 'owner';
+    adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">${owner ? 'Owner' : 'Admin'} panel</div><h3>${esc(US.me.name)}</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-gold btn-sm" type="button" data-close>Write a Post</button><button class="btn btn-ghost btn-sm" type="button" id="lgOut">Log Out</button></div>
+      ${owner ? `<hr><div class="label">Admins who can post</div><div class="ad-list" id="adList"><div class="muted" style="font-size:14px">Loading…</div></div>
+        <form id="adForm"><div class="cm-row" style="grid-template-columns:1fr 1fr"><label class="sr" for="adN">Name</label><input class="fi" id="adN" placeholder="Member name" maxlength="60"><label class="sr" for="adT">Role</label><input class="fi" id="adT" placeholder="Role, e.g. Marketing Manager" maxlength="60"></div>
+        <button class="btn btn-ghost btn-sm" type="submit">Make Admin</button><div id="adMsg"></div></form>` : ''}
+      <hr><div class="label">Change password</div>
+      <form id="pwForm"><label class="sr" for="pwC">Current password</label><input class="fi" id="pwC" type="password" autocomplete="current-password" placeholder="Current password">
+      <label class="sr" for="pwN">New password</label><input class="fi" id="pwN" type="password" autocomplete="new-password" placeholder="New password (10+ characters)">
+      <button class="btn btn-ghost btn-sm" type="submit">Update Password</button><div class="v-msg" id="pwMsg" role="status"></div></form></div>`;
+    $('#lgOut').onclick = () => { logout(false); closeOverlays(adminModal); toast('Logged out'); };
+    $('#pwForm').onsubmit = async e => {
+      e.preventDefault();
+      const m = $('#pwMsg'); m.className = 'v-msg'; m.textContent = 'Saving…';
+      const r = await uapi('/api/admin/password', 'POST', { current: $('#pwC').value, next: $('#pwN').value });
+      if (r.status === 401 && r.data.error === 'unauthorized') return logout(true);
+      m.className = 'v-msg ' + (r.data.ok ? 'ok' : 'err'); m.textContent = r.data.ok ? 'Password updated.' : (r.data.error === 'invalid' ? 'Current password is incorrect.' : errText(r));
+      if (r.data.ok) { $('#pwC').value = ''; $('#pwN').value = ''; }
+    };
+    if (!owner) return;
+    const list = async () => {
+      const r = await uapi('/api/admin/users');
+      if (r.status === 401) return logout(true);
+      const el = $('#adList'); if (!el) return;
+      el.innerHTML = r.data.ok ? (r.data.admins.length ? r.data.admins.map(a => `<div class="ad-item"><div><b>${esc(a.name)}</b><small>${esc(a.title || 'Admin')} · username: ${esc(a.u)}</small></div><button type="button" data-rm="${esc(a.u)}">Remove</button></div>`).join('') : '<div class="muted" style="font-size:14px">No admins yet. Only you can post.</div>') : `<div class="cm-msg err">${esc(errText(r))}</div>`;
+    };
+    list();
+    $('#adList').onclick = async e => {
+      const b = e.target.closest('[data-rm]'); if (!b) return;
+      if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = 'Confirm'; return; }
+      const r = await uapi('/api/admin/users/' + encodeURIComponent(b.dataset.rm), 'DELETE');
+      if (r.data.ok) { toast('Admin removed'); list(); } else toast(errText(r));
+    };
+    $('#adForm').onsubmit = async e => {
+      e.preventDefault();
+      const m = $('#adMsg');
+      const r = await uapi('/api/admin/users', 'POST', { name: $('#adN').value.trim(), title: $('#adT').value.trim() });
+      if (!r.data.ok) { m.innerHTML = `<div class="cm-msg err">${esc(errText(r))}</div>`; return; }
+      const cred = `Username: ${r.data.admin.u}\nPassword: ${r.data.password}`;
+      m.innerHTML = `<div class="cred"><b>${esc(r.data.admin.name)}</b> is now an admin. Share these login details privately — the password is shown only once.<br>Username: <code>${esc(r.data.admin.u)}</code><br>Password: <code>${esc(r.data.password)}</code><br><button class="btn btn-ghost btn-sm" type="button" id="adCopy" style="margin-top:8px">Copy Details</button></div>`;
+      $('#adCopy').onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(cred) : Promise.reject()).then(() => toast('Copied'), () => toast('Select the details to copy them')); };
+      $('#adN').value = ''; $('#adT').value = ''; list();
+    };
+  }
+
   /* ------------------------------------------------------------ menu */
   function setMenu(open) { document.body.classList.toggle('menu-open', open); $('#burger').setAttribute('aria-expanded', open); $('#burger').setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); document.body.classList.toggle('locked', open); }
   $('#burger').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
@@ -2533,6 +2720,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     } else show();
   }
   function afterRoute() {
+    if (current === 'updates') loadUpdates();
     if (pendingScroll && current === 'contact') { const id = pendingScroll; pendingScroll = null; setTimeout(() => $('#' + id).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }), 500); }
     if (pendingMember && current === 'team') { const m = pendingMember; pendingMember = null; const msg = $('#vMsg'); msg.className = 'v-msg'; msg.textContent = `Enter ${m}’s verification code to view the full verified profile.`; setTimeout(() => $('#vCode').focus({ preventScroll: true }), 700); }
   }
@@ -2585,7 +2773,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
   }
   // pre-build every 3D sculpture in idle time so page switches never stutter
   if (gl3d) {
-    const queue = ['lion', 'embers', 'geodesic', 'knot', 'orbits', 'vault', 'bars', 'helix', 'globe'];
+    const queue = ['lion', 'embers', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe'];
     const idle = window.requestIdleCallback || (f => setTimeout(f, 200));
     (function next() { if (!queue.length) return; idle(() => { gl3d.prewarm([queue.shift()]); next(); }, { timeout: 2500 }); })();
   }

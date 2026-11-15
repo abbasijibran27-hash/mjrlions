@@ -183,30 +183,6 @@ window.SERVICES.forEach(s => {
   s.faqs = faq(FAQ_NAME[s.id], HOW_LONG[s.id], inc, s.tech.slice(0, 4).join(', '));
 });
 
-window.WORKS = [
-  { client: 'Northline Labs', svc: 'web-development', cat: 'Web Development', out: 'Traffic +212% within 90 days. Conversion rate lifted 3.4x post-launch.', wins: ['Traffic +212% within 90 days', 'Conversion rate lifted 3.4x post-launch', 'Core Web Vitals: 98/100 across pages'], wide: true },
-  { client: 'Halcyon Beauty', svc: 'social-media-management', cat: 'Social Media', out: '0 → 84k followers in 6 months at a 7.2% average engagement rate.', wins: ['Grew 0 → 84k followers in 6 months', 'Engagement rate averages 7.2%'] },
-  { client: 'Vantage Ventures', svc: 'performance-marketing', cat: 'Performance Marketing', out: '6.4x ROAS at scale.', wins: ['6.4x ROAS at scale', 'Paid Ads management'] },
-  { client: 'Halcyon Beauty', svc: 'performance-marketing', cat: 'Performance Marketing', out: 'CAC reduced 41%.', wins: ['CAC reduced 41%'] },
-  { client: 'Meridian Group', svc: 'graphic-design', cat: 'Graphic Design', out: 'Full rebrand delivered in 4 weeks.', wins: ['Full rebrand delivered in 4 weeks'] },
-  { client: 'Vantage — Launch Film', svc: 'video-editing', cat: 'Video Editing', out: 'Launch video drove an 8-figure pipeline.', wins: ['Vantage launch video drove 8-figure pipeline'], wide: true },
-  { client: 'SaaS Launch', svc: 'ai-videos', cat: 'AI Videos', out: '128 creative variants in a single week.', wins: ['Ran 128 creative variants in a single week for a SaaS launch'] },
-  { client: 'DTC Brand — Creator Ads', svc: 'ugc-production', cat: 'UGC', out: '3.1x CTR uplift vs. produced ads.', wins: ['3.1x CTR uplift vs. produced ads for a DTC brand'] },
-  { client: 'Aurora', svc: 'content-writing', cat: 'Content Writing', out: '+240% organic traffic within 6 months.', wins: ['+240% organic traffic for Aurora within 6 months'] },
-  { client: 'B2B Pipeline Engine', svc: 'lead-generation', cat: 'Lead Generation', out: '340 SQLs generated in 60 days.', wins: ['Generated 340 SQLs in 60 days for a B2B client'] },
-  { client: 'DTC Brand — Content Engine', svc: 'ai-content-creation', cat: 'AI Content Creation', out: '90 days of content produced in one sprint.', wins: ['Produced 90 days of content in one sprint for a DTC brand'], wide: true }
-];
-
-window.TEAM = [
-  { key: 'mjr', name: 'MJR', title: 'Founder', role: 'Video Editor, UGC Video Production', dept: 'Founder · Video Production', mono: 'MJR', desc: 'Founder of MJR LION. Video editor and motion graphics specialist — cinematic edits, colour grading and UGC video production.', founder: true },
-  { key: 'sana', name: 'Ms. Sana Salahuddin', role: 'AI Video Content Creator', dept: 'AI Department', mono: 'SS', desc: 'AI video and AI-driven creative — from AI video production to automation across multiple domains.' },
-  { key: 'roma', name: 'Ms. Roma', role: 'Web Developer', dept: 'Web Development', mono: 'R', desc: 'Builds modern, responsive and visually engaging websites that are fast, user-friendly and on-brand.' },
-  { key: 'wasi', name: 'Mr. Wasi Mughal', role: 'Marketing Manager', dept: 'Marketing', mono: 'WM', desc: 'Meta, TikTok and Google ad campaigns — from research and testing through optimization and scaling.' },
-  { key: 'wahab', name: 'Mr. Wahab Haider', role: 'Graphic Designer', dept: 'Graphic Design', mono: 'WH', desc: 'Brand identity, social, campaign and print design — professional, creative visuals for growing brands.' },
-  { key: 'husnain', name: 'Mr. Husnain Abbasi', role: 'Social Media Manager', dept: 'Social Media', mono: 'HA', desc: '4+ years managing digital presence for brands, real estate companies and well-known personalities.' },
-  { key: 'jamshaid', name: 'Mr. Jamshaid Abbasi', role: 'Content Writer', dept: 'Content Writing', mono: 'JA', desc: 'Turns ideas, emotions and perspectives into compelling narratives that leave a lasting impression.' }
-];
-
 window.PRICING = [
   { name: 'Video Editing', d: 'Per project · cinematic color, sound and motion', p: '$120–$200', svc: 'video-editing' },
   { name: 'AI Video Editing', d: 'Per video · avatars, product demos, AI b-roll', p: '$150–$180', svc: 'ai-videos' },
