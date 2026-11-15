@@ -1,0 +1,8 @@
+# never commit private data or keys
+source-code/private/
+*.key
+.env
+.dev.vars
+node_modules/
+out/
+dist/
