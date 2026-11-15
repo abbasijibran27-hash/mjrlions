@@ -30,20 +30,25 @@ def clean_watermark_1(img):
     return out
 
 
-def brand_recolour(img, center=89, width=10, region=None):
+def brand_recolour(img, bands=((89, 10, None),), protect=()):
     """turn teal / cyan UI colours into MJR gold on near-black; leave wood, plants, food, blue icons alone.
-    Blending happens in RGB (not hue) so partial pixels never pass through green."""
+    bands: (hue_center, width, region_box_or_None). All bands are combined into ONE weight map and applied
+    in a single RGB blend, so pixels never pass through green / olive."""
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.float32)
     h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
-    hue_w = np.exp(-((h - center) / width) ** 2)           # teal / cyan band
     sat_w = np.clip((s - 15) / 45, 0, 1)                   # ignore neutral greys
-    w = hue_w * sat_w
-    if region:                                             # optional: only inside a feathered box
-        x0, y0, x1, y1 = region
-        box = np.zeros(w.shape, np.float32); box[y0:y1, x0:x1] = 1
-        w = w * cv2.GaussianBlur(box, (0, 0), 8)
+    w = np.zeros(h.shape, np.float32)
+    for center, width, region in bands:
+        bw = np.exp(-((h - center) / width) ** 2) * sat_w
+        if region:                                         # only inside a feathered box
+            x0, y0, x1, y1 = region
+            box = np.zeros(w.shape, np.float32); box[y0:y1, x0:x1] = 1
+            bw = bw * cv2.GaussianBlur(box, (0, 0), 8)
+        w = np.maximum(w, bw)
+    for (x0, y0, x1, y1) in protect:                       # keep UI colour wheels etc. untouched
+        w[y0:y1, x0:x1] = 0
     w = cv2.GaussianBlur(w, (0, 0), 1.0)[..., None]
-    bright = np.clip((v - 60) / 110, 0, 1)                 # dark teal -> charcoal, bright teal -> gold
+    bright = np.clip((v - 60) / 110, 0, 1)                 # dark teal -> charcoal/bronze, bright teal -> gold
     rec = hsv.copy()
     rec[..., 0] = 14.5 + (GOLD_H - 14.5) * bright         # darker gold leans bronze (never olive)
     rec[..., 1] = s * (.20 + .55 * bright)
@@ -83,11 +88,14 @@ if __name__ == '__main__':
     src, out = sys.argv[1], sys.argv[2]
     img = cv2.imread(src)
     if '--clean-wm1' in sys.argv: img = clean_watermark_1(img)
-    img = brand_recolour(img)
-    for a in sys.argv:                                     # --region=x0,y0,x1,y1,hue  (extra teal-blue spots)
+    orig = img.copy()
+    protect = [tuple(int(v) for v in a.split('=')[1].split(',')) for a in sys.argv if a.startswith('--protect=')]
+    bands = [(89, 10, None)]
+    for a in sys.argv:                                     # --region=x0,y0,x1,y1,hue  (extra teal-blue/green spots)
         if a.startswith('--region='):
             x0, y0, x1, y1, hc = [int(v) for v in a.split('=')[1].split(',')]
-            img = brand_recolour(img, center=hc, width=9, region=(x0, y0, x1, y1))
+            bands.append((hc, 9, (x0, y0, x1, y1)))
+    img = brand_recolour(img, bands, protect)
     for a in sys.argv:                                     # --warm=x0,y0,x1,y1  (olive-looking pastels -> warm gold)
         if a.startswith('--warm='):
             x0, y0, x1, y1 = [int(v) for v in a.split('=')[1].split(',')]
@@ -98,6 +106,12 @@ if __name__ == '__main__':
             hsv[..., 0] = hsv[..., 0] * (1 - olive) + 16 * olive
             hsv[..., 1] = np.minimum(255, hsv[..., 1] * (1 + .35 * olive))
             img = cv2.cvtColor(np.clip(hsv, 0, 255).astype(np.uint8), cv2.COLOR_HSV2BGR)
+    for a in sys.argv:                                     # --keep=x0,y0,x1,y1  (protect true colours, e.g. colour wheels)
+        if a.startswith('--keep='):
+            x0, y0, x1, y1 = [int(v) for v in a.split('=')[1].split(',')]
+            box = np.zeros(img.shape[:2], np.float32); box[y0:y1, x0:x1] = 1
+            box = cv2.GaussianBlur(box, (0, 0), 4)[..., None]
+            img = (img.astype(np.float32) * (1 - box) + orig.astype(np.float32) * box).astype(np.uint8)
     f = grade(img)
     big, small = finish(f, 1600, 3.0, .45, 7), finish(f, 960, 2.4, .35, 8)
     big.save(out + '-1600.webp', 'WEBP', quality=84, method=6)
