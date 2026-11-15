@@ -88,7 +88,7 @@
   $$('.split').forEach(split);
 
   /* ------------------------------------------------------------ reveal */
-  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: .08 }) : null;
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px 12% 0px', threshold: 0 }) : null;
   function observe(root) { $$('[data-r]:not(.in), .split:not(.in)', root).forEach(el => io ? io.observe(el) : el.classList.add('in')); }
 
   /* ------------------------------------------------------------ tilt + magnetic */
@@ -793,7 +793,7 @@
     if (prev && !reduced) {
       prev.classList.add('leave');
       const w = $('.wipe'); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go');
-      navTimer = setTimeout(show, 460);
+      show();   // instant swap — the new page fades in, nothing waits for the old one
     } else show();
   }
   function afterRoute() {
@@ -844,16 +844,20 @@
     document.body.classList.remove('intro-on');
     hdr.classList.remove('pre');
     route(location.hash.slice(1) || 'home', true);
-    setTimeout(() => intro.remove(), 1300);
+    setTimeout(() => intro.remove(), 650);
   }
   $('#skipIntro').addEventListener('click', endIntro);
   let seen = false;
-  try { seen = sessionStorage.getItem('mjr-intro') === '1'; sessionStorage.setItem('mjr-intro', '1'); } catch (e) { }
+  try { // intro plays at most once every 12 hours per browser
+    const last = +localStorage.getItem('mjr-intro') || 0;
+    seen = Date.now() - last < 12 * 3600e3;
+    if (!seen) localStorage.setItem('mjr-intro', String(Date.now()));
+  } catch (e) { }
   if (reduced || seen) { endIntro(); }
   else {
     if (gl3d) gl3d.go('galaxy', { x: 0, y: 0, s: isMobile() ? .55 : .95, o: .85, tilt: 0, spin: .35 }, { duration: 1.4, scatter: .4 });
     requestAnimationFrame(() => setTimeout(() => $('#intro').classList.add('play'), 60));
-    setTimeout(endIntro, 2600);
+    setTimeout(endIntro, 1500);
     addEventListener('keydown', function k(e) { if (e.key === 'Enter' || e.key === ' ') { endIntro(); removeEventListener('keydown', k); } });
   }
   // build every 3D sculpture in the background worker so page switches never stutter
