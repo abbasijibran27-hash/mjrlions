@@ -30,7 +30,11 @@ const db = { team: {}, projects: {} };
   const bits = new Uint8Array(await wc.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 10000, hash: 'SHA-256' }, base, 256));
   db.owner = { username: OWNER.username, name: OWNER.name, salt: Buffer.from(salt).toString('base64'), hash: Buffer.from(bits).toString('base64') };
 }
-TEAM_RECORDS.forEach(r => { db.team[r.code] = r.data; });
+TEAM_RECORDS.forEach(r => {
+  // member photo (private/photos/<key>.webp) travels inside the encrypted vault — never as a public file
+  const ph = resolve(here, 'private/photos', r.data.key + '.webp');
+  db.team[r.code] = existsSync(ph) ? { ...r.data, photo: 'data:image/webp;base64,' + readFileSync(ph).toString('base64') } : r.data;
+});
 PROJECT_RECORDS.forEach(r => { db.projects[r.code] = r.data; });
 const key = await wc.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['encrypt']);
 const iv = wc.getRandomValues(new Uint8Array(12));

@@ -2318,8 +2318,8 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     const bg = lq ? ` style="background-image:url(${lq})${pos ? ';background-position:' + esc(pos) : ''}"` : '';
     return `<div class="viz ${extra || ''}${img ? ' has-img' : ''}"${bg} data-art="${esc(svc.art)}">${img ? tag : `<div class="vz-art">${VIS.ART[svc.icon]}</div><span class="vz-chip">${esc(svc.chip)}</span><span class="vz-slot">Image slot · ${esc(svc.art)}</span>`}<span class="shine"></span></div>`;
   }
-  function photo(key, mono, name) {
-    const src = CFG.TEAM_PHOTOS[key];
+  function photo(key, mono, name, own) {
+    const src = own || CFG.TEAM_PHOTOS[key];
     return `<div class="photo">${src ? `<img src="${esc(src)}" alt="${esc(name)}" loading="lazy">` : `<div class="ring"></div><div class="mono"><span>${esc(mono)}</span></div><span class="vz-slot">Photo slot · professional portrait</span>`}</div>`;
   }
   const SVC = Object.fromEntries(SERVICES.map(s => [s.id, s]));
@@ -2525,7 +2525,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     const reel = p.reel ? `<section class="pf-sec glass" data-r><h3 class="label">Video Editing Showcase</h3><p style="margin-bottom:18px">A selection of cinematic edits, colour grades and motion work by MJR.</p><div class="reel">${p.reel.map((r, i) => { const src = CFG.SHOWREEL[i]; return `<div class="reel-item" style="--ry:${(i % 3 - 1) * -8}deg">${src ? `<video src="${esc(src)}" muted loop playsinline preload="none" controls></video>` : '<span class="play"></span>'}<span class="cap">${esc(r)}</span></div>`; }).join('')}</div></section>` : '';
     const el = $('#profile');
     el.innerHTML = `<div class="pf-grid">
-      <aside class="pf-side glass">${photo(p.key, p.mono, p.name)}<div class="pf-id"><span class="verified">${VIS.icon('shield').replace('<svg', '<svg style="width:14px;height:14px"')} Verified member</span><div class="dept-label">${esc(p.dept)}</div><h2>${esc(p.name)}</h2><div class="muted">${esc(p.role)}</div><div class="pf-code">ID ${esc(code.slice(0, 7))}•••${esc(code.slice(-2))}</div><button class="btn btn-ghost btn-sm" type="button" id="pfReset" style="margin-top:10px">Verify another member</button></div></aside>
+      <aside class="pf-side glass">${photo(p.key, p.mono, p.name, p.photo)}<div class="pf-id"><span class="verified">${VIS.icon('shield').replace('<svg', '<svg style="width:14px;height:14px"')} Verified member</span><div class="dept-label">${esc(p.dept)}</div><h2>${esc(p.name)}</h2><div class="muted">${esc(p.role)}</div><div class="pf-code">ID ${esc(code.slice(0, 7))}•••${esc(code.slice(-2))}</div><button class="btn btn-ghost btn-sm" type="button" id="pfReset" style="margin-top:10px">Verify another member</button></div></aside>
       <div class="pf-main">
         <section class="pf-sec glass" data-r><div class="dept-label" style="margin-bottom:16px">${esc(p.dept)}</div><h3 class="label">Profile</h3>${p.intro.map(x => `<p>${esc(x)}</p>`).join('')}</section>
         ${p.sections.map(sec).join('')}${reel}
