@@ -7,6 +7,7 @@
                  POST /api/posts            (owner/admin)  { type, title, body, image? }
                  DELETE /api/posts/:id      (owner/admin)
                  GET  /api/media/:id        (public images)
+   Projects:     GET|POST /api/admin/projects, GET|PUT|DELETE /api/admin/projects/:id  (owner/admin; delete = owner)
    Admin:        POST /api/admin/login      { username, password }
                  GET  /api/admin/me
                  POST /api/admin/password   { current, next }
@@ -60,12 +61,24 @@ async function lookup(request, env, kind) {
   const ip = ipOf(request);
   if (blocked('v:' + ip)) return json({ ok: false, error: 'rate_limited' }, 429);
   let body; try { body = await request.json(); } catch { return json({ ok: false, error: 'bad_request' }, 400); }
-  const prefix = kind === 'team' ? 'MJR-TM-' : 'MJR-PRJ-';
-  const code = normalise(kind === 'team' ? body.code : body.id, prefix);
-  if (!new RegExp('^' + prefix + '\\d{5}$').test(code)) return json({ ok: false, error: 'format' }, 400);
-  let db; try { db = await load(env); } catch { return json({ ok: false, error: 'not_configured' }, 503); }
+  let code;
+  if (kind === 'team') {
+    code = normalise(body.code, 'MJR-TM-');
+    if (!/^MJR-TM-\d{5}$/.test(code)) return json({ ok: false, error: 'format' }, 400);
+  } else {
+    code = projId(body.id);
+    if (!code) return json({ ok: false, error: 'format' }, 400);
+  }
   await sleep(250);
-  const rec = db[kind][code];
+  let rec = null;
+  if (kind === 'projects' && kvOK(env)) {
+    const p = await env.UPDATES.get('project:' + code, 'json');
+    if (p) rec = publicProject(p);
+  }
+  if (!rec) {
+    let db; try { db = await load(env); } catch { return json({ ok: false, error: 'not_configured' }, 503); }
+    rec = db[kind][code] || null;
+  }
   if (!rec) { failed('v:' + ip); return json({ ok: false, error: 'not_found' }, 404); }
   return json({ ok: true, data: rec });
 }
@@ -228,6 +241,83 @@ async function media(request, env, id, ctx) {
   return res;
 }
 
+/* ---------------------------------------------------------------- client projects (tracking portal) */
+const STATUSES = ['Booked', 'In Progress', 'Review', 'Revision', 'Finalization', 'Completed'];
+const ID_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function newProjectId() { const r = rand(8); let s = ''; for (let i = 0; i < 8; i++) s += ID_CHARS[r[i] % ID_CHARS.length]; return 'MJR-PRJ-' + s.slice(0, 4) + '-' + s.slice(4); }
+function projId(raw) {
+  let c = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 30);
+  if (c.startsWith('MJRPRJ')) c = c.slice(6);
+  if (/^\d{5}$/.test(c)) return 'MJR-PRJ-' + c;                         // legacy / demo IDs
+  if (/^[A-Z0-9]{8}$/.test(c)) return 'MJR-PRJ-' + c.slice(0, 4) + '-' + c.slice(4);
+  return null;
+}
+const str = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+const day = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : '';
+function today() { try { return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Karachi' }); } catch { return new Date().toISOString().slice(0, 10); } }
+function cleanProject(b) {
+  return {
+    client: str(b.client, 120), bookedBy: str(b.bookedBy, 80), service: str(b.service, 90),
+    start: day(b.start), expiry: day(b.expiry), country: str(b.country, 60),
+    bookingType: b.bookingType === 'Contract-based' ? 'Contract-based' : 'Project-wise',
+    payment: b.payment === 'PAID' ? 'PAID' : 'PENDING',
+    status: STATUSES.includes(b.status) ? b.status : 'Booked',
+    progress: Math.max(0, Math.min(100, Math.round(Number(b.progress) || 0))),
+    assigned: str(b.assigned, 80), stage: str(b.stage, 120), notes: str(b.notes, 2000),
+    milestones: (Array.isArray(b.milestones) ? b.milestones : []).slice(0, 20)
+      .map(m => ({ t: str(m && m.t, 120), d: day(m && m.d), done: !!(m && m.done) })).filter(m => m.t)
+  };
+}
+function publicProject(p) {
+  const { updatedBy, createdAt, updatedAt, createdBy, ...pub } = p;
+  return pub;
+}
+const projSummary = p => ({ id: p.id, client: p.client, service: p.service, status: p.status, progress: p.progress, payment: p.payment, country: p.country, expiry: p.expiry, lastUpdate: p.lastUpdate, at: p.updatedAt });
+async function projIndex(env) { return (await env.UPDATES.get('projects', 'json')) || []; }
+async function saveProject(env, p) {
+  await env.UPDATES.put('project:' + p.id, JSON.stringify(p));
+  const idx = (await projIndex(env)).filter(x => x.id !== p.id);
+  idx.unshift(projSummary(p));
+  await env.UPDATES.put('projects', JSON.stringify(idx.slice(0, 3000)));
+}
+async function projects(request, env, me, id) {
+  const M = request.method;
+  if (!id && M === 'GET') return json({ ok: true, projects: await projIndex(env) });
+  if (id && M === 'GET') {
+    const p = await env.UPDATES.get('project:' + id, 'json');
+    return p ? json({ ok: true, project: p }) : json({ ok: false, error: 'not_found' }, 404);
+  }
+  if (id && M === 'DELETE') {
+    if (me.r !== 'owner') return json({ ok: false, error: 'forbidden' }, 403);
+    await env.UPDATES.delete('project:' + id);
+    await env.UPDATES.put('projects', JSON.stringify((await projIndex(env)).filter(x => x.id !== id)));
+    return json({ ok: true });
+  }
+  if (M !== 'POST' && M !== 'PUT') return json({ ok: false, error: 'method' }, 405);
+  let b; try { b = await request.json(); } catch { return json({ ok: false, error: 'bad_request' }, 400); }
+  const c = cleanProject(b);
+  if (c.client.length < 2) return json({ ok: false, error: 'client' }, 400);
+  const now = Date.now(), note = str(b.logNote, 300);
+  if (M === 'POST' && !id) {
+    let nid = newProjectId();
+    while (await env.UPDATES.get('project:' + nid)) nid = newProjectId();
+    const p = { id: nid, ...c, lastUpdate: today(), createdAt: now, updatedAt: now, createdBy: me.n, updatedBy: me.n,
+      log: [{ at: now, status: c.status, progress: c.progress, stage: c.stage, note: note || 'Project booked' }] };
+    await saveProject(env, p);
+    return json({ ok: true, project: p });
+  }
+  if (M === 'PUT' && id) {
+    const old = await env.UPDATES.get('project:' + id, 'json');
+    if (!old) return json({ ok: false, error: 'not_found' }, 404);
+    const p = { ...old, ...c, id, lastUpdate: today(), updatedAt: now, updatedBy: me.n };
+    const changed = old.status !== c.status || old.progress !== c.progress || old.stage !== c.stage;
+    if (changed || note) p.log = [{ at: now, status: c.status, progress: c.progress, stage: c.stage, note }].concat(old.log || []).slice(0, 40);
+    await saveProject(env, p);
+    return json({ ok: true, project: p });
+  }
+  return json({ ok: false, error: 'method' }, 405);
+}
+
 /* ---------------------------------------------------------------- router */
 export default {
   async fetch(request, env, ctx) {
@@ -255,6 +345,8 @@ export default {
       if (p === '/api/admin/password' && M === 'POST') return await changePassword(request, env, me);
       if (p === '/api/admin/users') return await users(request, env, me);
       if (p.startsWith('/api/admin/users/') && M === 'DELETE') return await users(request, env, me, decodeURIComponent(p.slice(17)));
+      if (p === '/api/admin/projects') return await projects(request, env, me);
+      if (p.startsWith('/api/admin/projects/')) { const pid = projId(decodeURIComponent(p.slice(20))); if (!pid) return json({ ok: false, error: 'not_found' }, 404); return await projects(request, env, me, pid); }
       if (p === '/api/posts' && M === 'POST') return await createPost(request, env, me);
       if (p.startsWith('/api/posts/') && M === 'DELETE') return await deletePost(env, p.slice(11));
       return json({ ok: false, error: 'not_found' }, 404);

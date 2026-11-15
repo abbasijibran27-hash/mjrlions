@@ -4,7 +4,7 @@
    ========================================================================= */
 window.SITE_CONFIG = {
   /* Set to false before going live to hide the demo tracking IDs hint. */
-  DEMO_MODE: true,
+  DEMO_MODE: false,
   /* Replaceable photography. Put an image URL (or data: URI) against any key
      and it replaces the art-directed placeholder automatically. */
   IMAGES: {
@@ -36,8 +36,8 @@ window.SERVICES = [
     process: ['Discovery & scope alignment', 'UX architecture & wireframes', 'Design system & prototypes', 'Development & QA', 'Launch, analytics & handover'],
     timeline: '2–6 weeks',
     tech: ['Next.js', 'TanStack', 'React', 'Tailwind', 'GSAP', 'Framer', 'Motion', 'Sanity', 'Contentful'],
-    wins: [['+212%', 'Traffic within 90 days for Northline Labs'], ['3.4x', 'Conversion rate lifted post-launch'], ['98/100', 'Core Web Vitals across pages']],
-    chip: '98/100 CWV',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'Pixel-perfect',
     art: 'Premium developer workstation / website interface',
     price: 'Web Development is $499–$699 per project',
     faqs: null
@@ -50,8 +50,8 @@ window.SERVICES = [
     process: ['Audit & positioning', 'Content pillars', 'Production sprints', 'Publish & engage', 'Report & iterate'],
     timeline: 'Depends on work type — contract-based or project-wise',
     tech: ['Meta Business Suite', 'TikTok Studio', 'Later', 'Notion', 'Adobe Suite'],
-    wins: [['0 → 84k', 'Halcyon Beauty followers in 6 months'], ['7.2%', 'Average engagement rate']],
-    chip: '+84k followers',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'Always-on content',
     art: 'Professional social media strategist working with analytics',
     price: 'Social Media Management is $499–$599 per month'
   },
@@ -63,8 +63,8 @@ window.SERVICES = [
     process: ['Audit & benchmarking', 'Funnel & creative build', 'Launch & scale', 'Optimize continuously'],
     timeline: 'According to client requirements',
     tech: ['Meta Ads', 'Google Ads', 'TikTok Ads', 'LinkedIn Ads', 'GA4', 'GTM'],
-    wins: [['Paid Ads', 'Paid Ads management'], ['6.4x', 'ROAS at scale for Vantage Ventures'], ['−41%', 'CAC reduced for Halcyon Beauty']],
-    chip: '6.4x ROAS',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'Full-funnel',
     art: 'Advertising dashboards / campaign strategy',
     price: 'Paid Ads (TikTok, Facebook, Instagram, Google) is $300–$349 per month — the mentioned price is service charges only (per month)'
   },
@@ -76,7 +76,7 @@ window.SERVICES = [
     process: ['Discovery', 'Strategy', 'Design', 'Refinement', 'Handover'],
     timeline: 'Depending on your choice — contract or project-wise',
     tech: ['Figma', 'Illustrator', 'Photoshop', 'After Effects'],
-    wins: [['4 weeks', 'Meridian Group full rebrand delivered']],
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
     chip: 'Brand system',
     art: 'Designer working on brand identity',
     price: 'Graphic Design is $120–$250 per project'
@@ -89,7 +89,7 @@ window.SERVICES = [
     process: ['Brief', 'Assembly', 'Rough cut', 'Fine cut', 'Color & sound', 'Delivery'],
     timeline: 'Depending on your choice — contract-based or project-wise',
     tech: ['Premiere Pro', 'DaVinci Resolve', 'After Effects', 'Cinema 4D'],
-    wins: [['8-figure', 'Pipeline driven by the Vantage launch video']],
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
     chip: 'Color · Sound · Motion',
     art: 'Professional editor workstation',
     price: 'Video Editing is $120–$200 per project'
@@ -102,8 +102,8 @@ window.SERVICES = [
     process: ['Concept', 'Script', 'AI generation', 'Editing & polish', 'Delivery'],
     timeline: 'Depending on your choice — contract-based or project-wise',
     tech: ['Sora', 'Runway', 'Kling', 'Veo', 'ElevenLabs', 'HeyGen'],
-    wins: [['128', 'Creative variants in a single week for a SaaS launch']],
-    chip: '128 variants / week',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'AI pipelines',
     art: 'Professional AI production environment',
     price: 'AI Video Editing is $150–$180 per video'
   },
@@ -115,8 +115,8 @@ window.SERVICES = [
     process: ['Creator matching', 'Brief & script', 'Production', 'Editing', 'Delivery'],
     timeline: 'Depending on your choice — contract-based or project-wise',
     tech: ['Backlight', 'Frame.io', 'Notion'],
-    wins: [['3.1x', 'CTR uplift vs. produced ads for a DTC brand']],
-    chip: '3.1x CTR',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'Creator-led',
     art: 'Realistic creator filming product content',
     price: 'UGC Ads Creation is $200–$250 per creator batch'
   },
@@ -128,8 +128,8 @@ window.SERVICES = [
     process: ['Voice discovery', 'Content strategy', 'Draft & refine', 'Publish & optimize'],
     timeline: 'Per-piece or monthly retainer',
     tech: ['Notion', 'Ahrefs', 'Surfer', 'Grammarly Business'],
-    wins: [['+240%', 'Organic traffic for Aurora within 6 months']],
-    chip: '+240% organic',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'SEO-native',
     art: 'Professional editorial workspace',
     price: 'Content Creation / Writing is $499–$599 per month'
   },
@@ -141,8 +141,8 @@ window.SERVICES = [
     process: ['ICP definition', 'List & tooling', 'Sequences', 'Optimize'],
     timeline: '2 week setup · ongoing management',
     tech: ['HubSpot', 'Apollo', 'Instantly', 'Clay', 'Zapier'],
-    wins: [['340', 'SQLs generated in 60 days for a B2B client']],
-    chip: '340 SQLs',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'CRM automation',
     art: 'Sales / CRM analytics environment',
     price: 'Lead Generation is $100–$180 per month'
   },
@@ -154,8 +154,8 @@ window.SERVICES = [
     process: ['Voice training', 'Prompt & brief system', 'AI generation', 'Human refinement', 'Publish & measure'],
     timeline: '3–7 days per content sprint',
     tech: ['GPT-5', 'Claude', 'Gemini', 'Midjourney', 'ElevenLabs', 'Notion'],
-    wins: [['90 days', 'Of content produced in one sprint for a DTC brand']],
-    chip: '90 days · 1 sprint',
+    wins: [], // add real client results here later, e.g. [['+120%', 'Traffic in 90 days for Client X']]
+    chip: 'Brand-trained AI',
     art: 'Professional AI creative workflow',
     price: null
   }
@@ -165,7 +165,7 @@ const HOW_LONG = {
   'web-development': 'Most website projects take 2–6 weeks, depending on scope. We confirm the exact timeline during discovery & scope alignment.',
   'social-media-management': 'It depends on the work type — we run social media management either contract-based or project-wise, and agree the timeline before we start.',
   'performance-marketing': "It's set according to your requirements — campaigns can run as a short launch push or as an ongoing, continuously optimized engagement.",
-  'graphic-design': 'Depending on your choice — contract or project-wise. For reference, the Meridian Group full rebrand was delivered in 4 weeks.',
+  'graphic-design': 'Depending on your choice — contract or project-wise. We agree the timeline with you before we start.',
   'video-editing': 'Depending on your choice — contract-based or project-wise. We agree delivery dates for every cut at the brief stage.',
   'ai-videos': 'Depending on your choice — contract-based or project-wise. Because AI generation is fast, creative iterations happen in hours, not weeks.',
   'ugc-production': 'Depending on your choice — contract-based or project-wise, with fast-turnaround production once creators are matched.',

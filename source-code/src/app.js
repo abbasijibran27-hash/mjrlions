@@ -26,6 +26,7 @@
     services: { shape: 'geodesic', title: 'Services — MJR LION AGENCY', tilt: .25 },
     team: { shape: 'vault', title: 'Meet Our Team — Verification — MJR LION AGENCY', tilt: .1 },
     updates: { shape: 'knot', title: 'Updates — MJR LION AGENCY', tilt: .3 },
+    portal: { shape: 'helix', title: 'Admin Portal — MJR LION AGENCY', tilt: .12 },
     pricing: { shape: 'bars', title: 'Pricing — MJR LION AGENCY', tilt: .22 },
     track: { shape: 'helix', title: 'Track Your Project — MJR LION AGENCY', tilt: .12 },
     contact: { shape: 'globe', title: 'Contact Us — MJR LION AGENCY', tilt: .35 }
@@ -127,19 +128,6 @@
 
   /* ------------------------------------------------------------ HOME */
   $('#marquee').innerHTML = [0, 1].map(() => SERVICES.map(s => `<span>${esc(s.name)} <em>✦</em></span>`).join('')).join('');
-  const STATS = [
-    { v: 212, pre: '+', suf: '%', k: 'Traffic within 90 days', c: 'Northline Labs · Web' },
-    { v: 6.4, suf: 'x', dec: 1, k: 'ROAS at scale', c: 'Vantage Ventures · Ads' },
-    { v: 84, suf: 'k', k: 'Followers in 6 months', c: 'Halcyon Beauty · Social' },
-    { v: 340, k: 'SQLs in 60 days', c: 'B2B client · Lead Gen' }
-  ];
-  $('#stats').innerHTML = STATS.map((s, i) => `<div class="stat glass tilt" data-r style="--d:${i * .08}s"><div class="v gold" data-count="${s.v}" data-dec="${s.dec || 0}" data-pre="${s.pre || ''}" data-suf="${s.suf || ''}">${s.pre || ''}0${s.suf || ''}</div><div class="k">${s.k}</div><div class="c">${s.c}</div></div>`).join('');
-  const cio = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
-    if (!e.isIntersecting) return; cio.unobserve(e.target);
-    const el = e.target, to = +el.dataset.count, dec = +el.dataset.dec, t0 = performance.now(), dur = reduced ? 1 : 1800;
-    (function step(t) { const p = Math.min(1, (t - t0) / dur), v = to * (1 - Math.pow(1 - p, 4)); el.textContent = el.dataset.pre + v.toFixed(dec) + el.dataset.suf; if (p < 1) requestAnimationFrame(step); })(t0);
-  }), { threshold: .4 }) : null;
-  $$('[data-count]').forEach(el => cio ? cio.observe(el) : 0);
 
   // 3D service orbit
   const orbit = $('#orbit'), oWrap = $('#orbitWrap');
@@ -201,13 +189,15 @@
         ${viz(s, 'v2')}
       </div>
       <div class="sd-body">
-        ${accItem('01', 'Features', `<ul class="ticks">${s.features.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`, true)}
-        ${accItem('02', 'Benefits', `<ul class="ticks">${s.benefits.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`)}
-        ${accItem('03', 'Process', `<ol class="steps">${s.process.map(p => `<li>${esc(p)}</li>`).join('')}</ol>`)}
-        ${accItem('04', 'Estimated Timeline', `<div class="timeline-pill">${VIS.icon('clock')}<span>${esc(s.timeline)}</span></div>`)}
-        ${accItem('05', 'Technologies', `<div class="techs">${s.tech.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>`)}
-        ${accItem('06', 'Client Success Highlights', `<div class="wins">${s.wins.map(([b, t]) => `<div class="win"><b class="gold">${esc(b)}</b>${esc(t)}</div>`).join('')}</div>`)}
-        ${accItem('07', 'Frequently Asked Questions', faqs)}
+        ${[
+          ['Features', `<ul class="ticks">${s.features.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`],
+          ['Benefits', `<ul class="ticks">${s.benefits.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`],
+          ['Process', `<ol class="steps">${s.process.map(p => `<li>${esc(p)}</li>`).join('')}</ol>`],
+          ['Estimated Timeline', `<div class="timeline-pill">${VIS.icon('clock')}<span>${esc(s.timeline)}</span></div>`],
+          ['Technologies', `<div class="techs">${s.tech.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>`],
+          s.wins && s.wins.length ? ['Client Success Highlights', `<div class="wins">${s.wins.map(([b, t]) => `<div class="win"><b class="gold">${esc(b)}</b>${esc(t)}</div>`).join('')}</div>`] : null,
+          ['Frequently Asked Questions', faqs]
+        ].filter(Boolean).map(([t, h], i) => accItem(String(i + 1).padStart(2, '0'), t, h, i === 0)).join('')}
         <div class="sd-cta"><div><div class="label">Ready?</div><div class="h-md" style="margin-top:8px">Start your ${esc(s.name)} project.</div></div><div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn btn-ghost" href="#pricing" data-close>View Pricing</a><a class="btn btn-gold" href="#contact" data-svc="${s.id}" data-close data-mag>Start This Project <span class="arr">→</span></a></div></div>
       </div>`;
     sheetPanel.scrollTop = 0;
@@ -350,12 +340,19 @@
   // project tracking
   const tState = { fails: 0, lock: 0 };
   if (CFG.DEMO_MODE) $('#tDemo').innerHTML = 'Demo mode — try <code>MJR-PRJ-26101</code>, <code>MJR-PRJ-26102</code> or <code>MJR-PRJ-26103</code>.';
+  function projId(raw) {
+    let c = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 30);
+    if (c.startsWith('MJRPRJ')) c = c.slice(6);
+    if (/^\d{5}$/.test(c)) return 'MJR-PRJ-' + c;
+    if (/^[A-Z0-9]{8}$/.test(c)) return 'MJR-PRJ-' + c.slice(0, 4) + '-' + c.slice(4);
+    return null;
+  }
   $('#trkForm').addEventListener('submit', async e => {
     e.preventDefault();
     const input = $('#tCode'), msg = $('#tMsg'), f = $('#trkForm');
     if (!guard(tState, msg)) return;
-    const code = norm(input.value, 'MJR-PRJ-');
-    if (!/^MJR-PRJ-\d{5}$/.test(code)) return fail(tState, input, msg, 'Tracking IDs look like MJR-PRJ-00000.');
+    const code = projId(input.value);
+    if (!code) return fail(tState, input, msg, 'Tracking IDs look like MJR-PRJ-7K4P-Q9XD. Please check and try again.');
     msg.className = 'v-msg'; msg.textContent = 'Authenticating & loading your project…'; f.classList.add('vault', 'scanning');
     let rec = null;
     try { [rec] = await Promise.all([api('projects', code), new Promise(r => setTimeout(r, reduced ? 0 : 600))]); }
@@ -365,12 +362,14 @@
     tState.fails = 0; msg.className = 'v-msg ok'; msg.textContent = 'Project found.';
     renderDash(rec);
   });
-  const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const fmt = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   function renderDash(p) {
     const STAGES = ['Booked', 'In Progress', 'Review', 'Revision', 'Finalization', 'Completed'];
     const si = Math.max(0, STAGES.indexOf(p.status));
-    const days = Math.ceil((new Date(p.expiry + 'T23:59:59') - new Date()) / 864e5);
-    const remain = p.status === 'Completed' ? 'Completed' : days < 0 ? 'Past due' : days + (days === 1 ? ' day' : ' days');
+    const days = p.expiry ? Math.ceil((new Date(p.expiry + 'T23:59:59') - new Date()) / 864e5) : null;
+    const remain = p.status === 'Completed' ? 'Completed' : days == null ? 'Ongoing' : days < 0 ? 'Past due' : days + (days === 1 ? ' day' : ' days');
+    const ms = p.milestones || [], log = p.log || [];
+    const when = t => new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const paid = p.payment === 'PAID';
     const el = $('#dash');
     el.innerHTML = `
@@ -381,11 +380,12 @@
           <div class="prog glass"><div class="prog-top"><div><div class="label">Total project progress</div><div class="muted" style="margin-top:8px">Current stage: <b style="color:var(--text);font-weight:500">${esc(p.stage)}</b></div></div><div class="pct gold" data-pct="${p.progress}">0%</div></div>
             <div class="bar"><i></i></div>
             <div class="stages">${STAGES.map((s, i) => `<div class="stage ${i < si || p.status === 'Completed' ? 'done' : ''} ${i === si && p.status !== 'Completed' ? 'cur' : ''}">${s}</div>`).join('')}</div></div>
-          <dl class="kv">${[['Client / booking name', p.client], ['Staff member who booked', p.bookedBy], ['Project number', p.id], ['Service booked', p.service], ['Project start date', fmt(p.start)], ['Project expiry date', fmt(p.expiry)], ['Country', p.country], ['Booking type', p.bookingType], ['Payment status', paid ? 'PAID / PAYMENT CLEAR' : 'PENDING'], ['Current project status', p.status], ['Assigned team member', p.assigned], ['Last update', fmt(p.lastUpdate)]].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+          <dl class="kv">${[['Client / booking name', p.client], ['Staff member who booked', p.bookedBy], ['Project number', p.id], ['Service booked', p.service], ['Project start date', fmt(p.start)], ['Project expiry date', fmt(p.expiry)], ['Country', p.country], ['Booking type', p.bookingType], ['Payment status', paid ? 'PAID / PAYMENT CLEAR' : 'PENDING'], ['Current project status', p.status], ['Assigned team member', p.assigned], ['Last update', fmt(p.lastUpdate)]].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v || '—')}</dd></div>`).join('')}</dl>
+          ${log.length ? `<div class="log glass"><div class="label" style="margin-bottom:16px">Progress log</div><ul class="ms">${log.slice(0, 10).map(l => `<li class="done">${esc(l.status)} · ${+l.progress}%${l.stage ? ' — ' + esc(l.stage) : ''}${l.note ? `<span class="ln-note">${esc(l.note)}</span>` : ''}<small>${when(l.at)}</small></li>`).join('')}</ul></div>` : ''}
         </div>
         <aside class="side-card glass"><div class="label">Remaining time</div><div class="remain gold">${esc(remain)}</div><div class="muted" style="font-size:13px">Until ${fmt(p.expiry)}</div>
-          <div class="label" style="margin-top:14px">Milestones</div><ul class="ms">${p.milestones.map(m => `<li class="${m.done ? 'done' : ''}">${esc(m.t)}<small>${fmt(m.d)}${m.done ? ' · done' : ''}</small></li>`).join('')}</ul>
-          <div class="label">Important notes</div><div class="notes-box">${esc(p.notes)}</div>
+          ${ms.length ? `<div class="label" style="margin-top:14px">Milestones</div><ul class="ms">${ms.map(m => `<li class="${m.done ? 'done' : ''}">${esc(m.t)}<small>${m.d ? fmt(m.d) : ''}${m.done ? (m.d ? ' · ' : '') + 'done' : ''}</small></li>`).join('')}</ul>` : ''}
+          ${p.notes ? `<div class="label">Important notes</div><div class="notes-box">${esc(p.notes)}</div>` : ''}
           <a class="btn btn-ghost btn-sm" href="#contact">Contact your team</a></aside>
       </div>`;
     el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
@@ -490,9 +490,27 @@
       im.src = url;
     });
   }
+  async function ensureMe() {
+    if (!US.checked && US.token) { US.checked = true; const r = await uapi('/api/admin/me'); if (r.data.ok) US.me = r.data.me; else if (r.status === 401) logout(false); }
+  }
+  const loginHTML = (px, title, sub) => `<div class="label">MJR LION · Admin</div><h3>${title}</h3><p class="muted" style="font-size:14px">${sub}</p>
+    <form id="${px}Form" autocomplete="on" style="display:grid;gap:10px"><label class="sr" for="${px}U">Username</label><input class="fi" id="${px}U" autocomplete="username" placeholder="Username" autocapitalize="none" spellcheck="false">
+    <label class="sr" for="${px}P">Password</label><input class="fi" id="${px}P" type="password" autocomplete="current-password" placeholder="Password">
+    <button class="btn btn-gold" type="submit">Log In</button><div class="v-msg" id="${px}Msg" role="status"></div></form>`;
+  function bindLogin(px, done) {
+    $('#' + px + 'Form').onsubmit = async e => {
+      e.preventDefault();
+      const m = $('#' + px + 'Msg'); m.className = 'v-msg'; m.textContent = 'Checking…';
+      const r = await uapi('/api/admin/login', 'POST', { username: $('#' + px + 'U').value.trim(), password: $('#' + px + 'P').value });
+      if (!r.data.ok) { m.className = 'v-msg err'; m.textContent = errText(r); return; }
+      US.token = r.data.token; US.me = r.data.me; US.checked = true; try { localStorage.setItem('mjr-admin', US.token); } catch (err) { }
+      renderComposer(); renderFeed(); toast('Welcome, ' + US.me.name);
+      if (done) done();
+    };
+  }
   async function loadUpdates(force) {
     renderFilters();
-    if (!US.checked && US.token) { US.checked = true; const r = await uapi('/api/admin/me'); if (r.data.ok) US.me = r.data.me; else if (r.status === 401) logout(false); }
+    await ensureMe();
     renderComposer();
     if (!force && US.loaded && Date.now() - US.at < 30000) return renderFeed();
     if (!US.loaded) renderFeed();
@@ -505,6 +523,7 @@
     US.token = null; US.me = null; try { localStorage.removeItem('mjr-admin'); } catch (e) { }
     renderComposer(); renderFeed(); if (expired) toast('Session expired. Please log in again.');
     if (adminModal.classList.contains('open')) renderAdmin();
+    if (current === 'portal') { closeOverlays(sheet); renderPortal(); }
   }
   $('#uFilters').addEventListener('click', e => { const b = e.target.closest('[data-uf]'); if (!b) return; US.f = b.dataset.uf; renderFilters(); renderFeed(); });
   feedEl.addEventListener('click', async e => {
@@ -533,23 +552,13 @@
   async function renderAdmin() {
     const close = '<button class="sheet-close" type="button" data-close aria-label="Close"></button>';
     if (!US.me) {
-      adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">Updates · Admin</div><h3>Log in to post updates</h3><p class="muted" style="font-size:14px">Only the MJR LION owner and admins approved by the owner can post.</p>
-        <form id="lgForm" autocomplete="on"><label class="sr" for="lgU">Username</label><input class="fi" id="lgU" autocomplete="username" placeholder="Username" autocapitalize="none" spellcheck="false">
-        <label class="sr" for="lgP">Password</label><input class="fi" id="lgP" type="password" autocomplete="current-password" placeholder="Password">
-        <button class="btn btn-gold" type="submit">Log In</button><div class="v-msg" id="lgMsg" role="status"></div></form></div>`;
-      $('#lgForm').onsubmit = async e => {
-        e.preventDefault();
-        const m = $('#lgMsg'); m.className = 'v-msg'; m.textContent = 'Checking…';
-        const r = await uapi('/api/admin/login', 'POST', { username: $('#lgU').value.trim(), password: $('#lgP').value });
-        if (!r.data.ok) { m.className = 'v-msg err'; m.textContent = errText(r); return; }
-        US.token = r.data.token; US.me = r.data.me; US.checked = true; try { localStorage.setItem('mjr-admin', US.token); } catch (err) { }
-        renderComposer(); renderFeed(); renderAdmin(); toast('Welcome, ' + US.me.name);
-      };
+      adminPanel.innerHTML = `${close}<div class="admin-body">${loginHTML('lg', 'Log in to post updates', 'Only the MJR LION owner and admins approved by the owner can post updates and manage projects.')}</div>`;
+      bindLogin('lg', () => { renderAdmin(); if (current === 'portal') renderPortal(); });
       return;
     }
     const owner = US.me.role === 'owner';
     adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">${owner ? 'Owner' : 'Admin'} panel</div><h3>${esc(US.me.name)}</h3>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-gold btn-sm" type="button" data-close>Write a Post</button><button class="btn btn-ghost btn-sm" type="button" id="lgOut">Log Out</button></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-gold btn-sm" href="#updates" data-close>Write a Post</a><a class="btn btn-ghost btn-sm" href="#portal" data-close>Project Portal</a><button class="btn btn-ghost btn-sm" type="button" id="lgOut">Log Out</button></div>
       ${owner ? `<hr><div class="label">Admins who can post</div><div class="ad-list" id="adList"><div class="muted" style="font-size:14px">Loading…</div></div>
         <form id="adForm"><div class="cm-row" style="grid-template-columns:1fr 1fr"><label class="sr" for="adN">Name</label><input class="fi" id="adN" placeholder="Member name" maxlength="60"><label class="sr" for="adT">Role</label><input class="fi" id="adT" placeholder="Role, e.g. Marketing Manager" maxlength="60"></div>
         <button class="btn btn-ghost btn-sm" type="submit">Make Admin</button><div id="adMsg"></div></form>` : ''}
@@ -592,6 +601,138 @@
     };
   }
 
+  /* ------------------------------------------------------------ PROJECT PORTAL (owner / admins) */
+  const portalEl = $('#portal');
+  const PJ = { list: [], q: '' };
+  const STAGE_LIST = ['Booked', 'In Progress', 'Review', 'Revision', 'Finalization', 'Completed'];
+  const SVC_NAMES = SERVICES.map(s => s.name).concat(['All-in-One Standard Brand Program', 'All-in-One Premium Brand Program']);
+  const TEAM_NAMES = ['MJR (Mr. Jibran)', 'Ms. Sana Salahuddin', 'Ms. Roma', 'Mr. Wasi Mughal', 'Mr. Wahab Haider', 'Mr. Husnain Abbasi', 'Mr. Jamshaid Abbasi'];
+  const todayISO = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+  const opt = (list, v) => list.map(x => `<option${x === v ? ' selected' : ''}>${esc(x)}</option>`).join('');
+  async function renderPortal() {
+    await ensureMe();
+    if (!US.me) {
+      portalEl.innerHTML = `<div class="vault glass" style="max-width:540px">${loginHTML('pl', 'Log in to manage projects', 'Only the MJR LION owner and approved admins can open the project portal.')}</div>`;
+      bindLogin('pl', () => renderPortal());
+      return;
+    }
+    portalEl.innerHTML = `
+      <div class="pj-bar glass"><div><div class="label">${US.me.role === 'owner' ? 'Owner' : 'Admin'}</div><b>${esc(US.me.name)}</b></div>
+        <label class="sr" for="pjQ">Search projects</label><input class="fi" id="pjQ" placeholder="Search by client, tracking ID or service…" value="${esc(PJ.q)}">
+        <button class="btn btn-gold btn-sm" type="button" id="pjNew">+ New Project</button><button class="btn btn-ghost btn-sm" type="button" data-admin-open>Admin Panel</button></div>
+      <div class="pj-stats" id="pjStats"></div>
+      <div class="pj-list" id="pjList"><div class="sk"></div><div class="sk"></div></div>`;
+    $('#pjNew').onclick = () => openProject(null);
+    $('#pjQ').oninput = e => { PJ.q = e.target.value; renderProjects(); };
+    const r = await uapi('/api/admin/projects');
+    if (r.status === 401) return logout(true);
+    if (!r.data.ok) { $('#pjList').innerHTML = `<div class="feed-empty glass"><b>Projects couldn’t load.</b>${esc(errText(r))}</div>`; return; }
+    PJ.list = r.data.projects || [];
+    renderProjects();
+  }
+  function renderProjects() {
+    const L = PJ.list, q = PJ.q.trim().toLowerCase();
+    const stats = $('#pjStats'), listEl = $('#pjList');
+    if (!listEl) return;
+    stats.innerHTML = [[L.length, 'Total projects'], [L.filter(p => p.status !== 'Completed').length, 'Active'], [L.filter(p => p.status === 'Completed').length, 'Completed'], [L.filter(p => p.payment !== 'PAID').length, 'Payment pending']]
+      .map(([n, k]) => `<div class="pj-stat"><b class="gold">${n}</b><span>${k}</span></div>`).join('');
+    const rows = L.filter(p => !q || [p.id, p.client, p.service, p.country, p.status].join(' ').toLowerCase().includes(q));
+    listEl.innerHTML = rows.length ? rows.map(p => `<div class="pj">
+        <div><div class="pj-id">${esc(p.id)}</div><b>${esc(p.client)}</b><small>${esc(p.service || '—')}${p.country ? ' · ' + esc(p.country) : ''}</small></div>
+        <div class="badges"><span class="badge stat"><i></i>${esc(p.status)}</span><span class="badge ${p.payment === 'PAID' ? 'paid' : 'pending'}"><i></i>${p.payment === 'PAID' ? 'Paid' : 'Pending'}</span></div>
+        <div class="pj-prog"><div class="bar sm"><i style="width:${+p.progress}%"></i></div><small>${+p.progress}% · updated ${fmt(p.lastUpdate)}</small></div>
+        <button class="btn btn-ghost btn-sm" type="button" data-pj="${esc(p.id)}">Update</button></div>`).join('')
+      : `<div class="feed-empty glass"><b>${L.length ? 'No projects match your search.' : 'No projects yet.'}</b>${L.length ? '' : 'Click “New Project” to book your first client project and get a tracking ID.'}</div>`;
+  }
+  portalEl.addEventListener('click', e => { const b = e.target.closest('[data-pj]'); if (b) openProject(b.dataset.pj); });
+  function msRow(m) {
+    return `<div class="ms-row"><input class="fi" type="text" placeholder="Milestone, e.g. Design approved" value="${esc(m.t || '')}" maxlength="120"><input class="fi" type="date" value="${esc(m.d || '')}"><label><input type="checkbox"${m.done ? ' checked' : ''}> Done</label><button class="x" type="button" aria-label="Remove milestone">×</button></div>`;
+  }
+  async function openProject(id) {
+    lastFocus = document.activeElement;
+    let p = { client: '', bookedBy: US.me.name, service: '', start: todayISO(), expiry: '', country: '', bookingType: 'Project-wise', payment: 'PENDING', status: 'Booked', progress: 0, assigned: '', stage: '', notes: '', milestones: [] };
+    if (id) {
+      const r = await uapi('/api/admin/projects/' + encodeURIComponent(id));
+      if (r.status === 401) return logout(true);
+      if (!r.data.ok) { toast(errText(r)); return; }
+      p = r.data.project;
+    }
+    const F = (lbl, html, full) => `<div class="fld${full ? ' full' : ''}"><label>${lbl}</label>${html}</div>`;
+    sheetPanel.innerHTML = `<button class="sheet-close" type="button" data-close aria-label="Close"></button>
+      <div class="admin-body" style="max-width:980px;margin:0 auto">
+        <div class="label">${id ? 'Update project · ' + esc(p.id) : 'New project'}</div>
+        <h3 style="font-size:clamp(1.6rem,3vw,2.3rem)">${id ? esc(p.client) : 'Book a client project'}</h3>
+        <form class="pj-form" id="pjForm" novalidate>
+          ${F('Client / booking name', `<input name="client" value="${esc(p.client)}" maxlength="120" required>`)}
+          ${F('Staff member who booked', `<input name="bookedBy" value="${esc(p.bookedBy)}" maxlength="80" list="pjTeam">`)}
+          ${F('Service booked', `<select name="service"><option value="">Select a service…</option>${opt(SVC_NAMES, p.service)}</select>`)}
+          ${F('Assigned team member', `<input name="assigned" value="${esc(p.assigned)}" maxlength="80" list="pjTeam">`)}
+          ${F('Project start date', `<input type="date" name="start" value="${esc(p.start)}">`)}
+          ${F('Project expiry date', `<input type="date" name="expiry" value="${esc(p.expiry)}">`)}
+          ${F('Country', `<input name="country" value="${esc(p.country)}" maxlength="60" placeholder="e.g. United Kingdom">`)}
+          ${F('Booking type', `<select name="bookingType">${opt(['Project-wise', 'Contract-based'], p.bookingType)}</select>`)}
+          ${F('Payment status', `<select name="payment"><option value="PENDING"${p.payment !== 'PAID' ? ' selected' : ''}>PENDING</option><option value="PAID"${p.payment === 'PAID' ? ' selected' : ''}>PAID / PAYMENT CLEAR</option></select>`)}
+          ${F('Current project status', `<select name="status">${opt(STAGE_LIST, p.status)}</select>`)}
+          ${F(`Total progress: <b id="pjPct" style="color:var(--gold2)">${+p.progress}%</b>`, `<input type="range" name="progress" min="0" max="100" step="5" value="${+p.progress}">`, true)}
+          ${F('Current stage (what the team is doing now)', `<input name="stage" value="${esc(p.stage)}" maxlength="120" placeholder="e.g. Development & QA">`, true)}
+          ${F('Important notes for the client', `<textarea name="notes" maxlength="2000" placeholder="Anything the client should know…">${esc(p.notes)}</textarea>`, true)}
+          <h4 class="label">Milestones</h4>
+          <div class="full ms-edit" id="msEdit">${(p.milestones || []).map(msRow).join('')}</div>
+          <div class="full pj-actions"><button class="btn btn-ghost btn-sm" type="button" id="msAdd">+ Add Milestone</button><button class="btn btn-ghost btn-sm" type="button" id="msFill">Use Service Steps</button></div>
+          ${F('Update message for the client (optional — appears in their progress log)', `<textarea name="logNote" maxlength="300" style="min-height:80px" placeholder="e.g. Homepage design approved, development has started."></textarea>`, true)}
+          <div class="full pj-actions" style="justify-content:space-between;margin-top:6px">
+            <div class="pj-actions"><button class="btn btn-gold" type="submit" id="pjSave">${id ? 'Save Changes' : 'Create Project'} <span class="arr">→</span></button><span class="cm-msg" id="pjMsg"></span></div>
+            ${id && US.me.role === 'owner' ? '<button class="btn btn-ghost btn-sm" type="button" id="pjDel" style="color:#e38a6c;border-color:rgba(227,138,108,.45)">Delete Project</button>' : ''}
+          </div>
+        </form>
+        <datalist id="pjTeam">${TEAM_NAMES.map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+        <div id="pjDone"></div>
+      </div>`;
+    const form = $('#pjForm'), msEdit = $('#msEdit');
+    form.elements.progress.oninput = e => { $('#pjPct').textContent = e.target.value + '%'; };
+    form.elements.status.onchange = e => { if (e.target.value === 'Completed') { form.elements.progress.value = 100; $('#pjPct').textContent = '100%'; } };
+    $('#msAdd').onclick = () => { msEdit.insertAdjacentHTML('beforeend', msRow({})); $('.ms-row:last-child input', msEdit).focus(); };
+    $('#msFill').onclick = () => {
+      const s = SERVICES.find(x => x.name === form.elements.service.value);
+      if (!s) { toast('Select a service first'); return; }
+      msEdit.innerHTML = s.process.map(t => msRow({ t })).join('');
+    };
+    msEdit.onclick = e => { const x = e.target.closest('.x'); if (x) x.parentElement.remove(); };
+    if (id && $('#pjDel')) $('#pjDel').onclick = async e => {
+      const b = e.currentTarget;
+      if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = 'Click again to delete'; return; }
+      const r = await uapi('/api/admin/projects/' + encodeURIComponent(id), 'DELETE');
+      if (!r.data.ok) { toast(errText(r)); return; }
+      PJ.list = PJ.list.filter(x => x.id !== id); renderProjects(); closeOverlays(sheet); toast('Project deleted');
+    };
+    form.onsubmit = async e => {
+      e.preventDefault();
+      const fe = form.elements, msg = $('#pjMsg');
+      const body = { client: fe.client.value, bookedBy: fe.bookedBy.value, service: fe.service.value, assigned: fe.assigned.value, start: fe.start.value, expiry: fe.expiry.value, country: fe.country.value, bookingType: fe.bookingType.value, payment: fe.payment.value, status: fe.status.value, progress: +fe.progress.value, stage: fe.stage.value, notes: fe.notes.value, logNote: fe.logNote.value,
+        milestones: $$('.ms-row', msEdit).map(r => ({ t: r.querySelector('input[type=text]').value, d: r.querySelector('input[type=date]').value, done: r.querySelector('input[type=checkbox]').checked })) };
+      if (body.client.trim().length < 2) { msg.className = 'cm-msg err'; msg.textContent = 'Please enter the client / booking name.'; fe.client.focus(); return; }
+      $('#pjSave').disabled = true; msg.className = 'cm-msg'; msg.textContent = 'Saving…';
+      const r = await uapi(id ? '/api/admin/projects/' + encodeURIComponent(id) : '/api/admin/projects', id ? 'PUT' : 'POST', body);
+      $('#pjSave').disabled = false;
+      if (r.status === 401) return logout(true);
+      if (!r.data.ok) { msg.className = 'cm-msg err'; msg.textContent = r.data.error === 'client' ? 'Please enter the client / booking name.' : errText(r); return; }
+      const saved = r.data.project;
+      PJ.list = [{ id: saved.id, client: saved.client, service: saved.service, status: saved.status, progress: saved.progress, payment: saved.payment, country: saved.country, expiry: saved.expiry, lastUpdate: saved.lastUpdate }].concat(PJ.list.filter(x => x.id !== saved.id));
+      renderProjects();
+      if (id) { closeOverlays(sheet); toast('Project updated — the client sees it now'); return; }
+      const link = location.origin + location.pathname + '#track';
+      const note = `Hello ${saved.client},\nThank you for choosing MJR LION AGENCY. Your project${saved.service ? ' (' + saved.service + ')' : ''} is booked.\n\nTracking ID: ${saved.id}\nTrack your project anytime: ${link}\n\nMJR LION AGENCY — Your Success Our Pride`;
+      form.remove();
+      $('#pjDone').innerHTML = `<div class="pj-done"><div class="label" style="color:var(--ok)">Project created</div><div>Share this tracking ID with <b>${esc(saved.client)}</b>:</div><div class="big">${esc(saved.id)}</div>
+        <div class="pj-actions"><button class="btn btn-gold btn-sm" type="button" id="cpMsg">Copy Message for Client</button><a class="btn btn-ghost btn-sm" href="https://wa.me/?text=${encodeURIComponent(note)}" target="_blank" rel="noopener">Send on WhatsApp</a><button class="btn btn-ghost btn-sm" type="button" id="cpId">Copy ID</button><button class="btn btn-ghost btn-sm" type="button" data-close>Done</button></div></div>`;
+      const copy = t => (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Copied'), () => toast('Select the text to copy it'));
+      $('#cpMsg').onclick = () => copy(note); $('#cpId').onclick = () => copy(saved.id);
+    };
+    sheetPanel.scrollTop = 0;
+    sheet.classList.add('open'); document.body.classList.add('locked');
+    setTimeout(() => { const f = id ? $('.sheet-close', sheetPanel) : form.elements.client; f && f.focus({ preventScroll: true }); }, 60);
+  }
+
   /* ------------------------------------------------------------ menu */
   function setMenu(open) { document.body.classList.toggle('menu-open', open); $('#burger').setAttribute('aria-expanded', open); $('#burger').setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); document.body.classList.toggle('locked', open); }
   $('#burger').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
@@ -624,6 +765,7 @@
   }
   function afterRoute() {
     if (current === 'updates') loadUpdates();
+    if (current === 'portal') renderPortal();
     if (pendingScroll && current === 'contact') { const id = pendingScroll; pendingScroll = null; setTimeout(() => $('#' + id).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }), 500); }
     if (pendingMember && current === 'team') { const m = pendingMember; pendingMember = null; const msg = $('#vMsg'); msg.className = 'v-msg'; msg.textContent = `Enter ${m}’s verification code to view the full verified profile.`; setTimeout(() => $('#vCode').focus({ preventScroll: true }), 700); }
   }
