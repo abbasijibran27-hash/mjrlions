@@ -4,7 +4,7 @@
 //         <outDir>/worker/vault.json   (team profiles + projects, AES-256-GCM encrypted)
 // The encryption key is read from private/secret.key (base64, 32 bytes) and must be
 // added to Cloudflare as the secret MJR_SECRET. private/ is never committed.
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, cpSync } from 'node:fs';
 import { webcrypto as wc } from 'node:crypto';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,7 +45,7 @@ const js = ['src/data.js', 'src/visuals.js', 'src/gl.js', 'src/app.js'].map(read
 html = html.replace('/*__STYLES__*/', () => read('src/styles.css')).replace('/*__SCRIPTS__*/', () => js);
 mkdirSync(resolve(out, 'website'), { recursive: true });
 writeFileSync(resolve(out, 'website/index.html'), html);
-for (const f of ['robots.txt', 'sitemap.xml', '_headers']) copyFileSync(resolve(here, 'public', f), resolve(out, 'website', f));
+cpSync(resolve(here, 'public'), resolve(out, 'website'), { recursive: true }); // robots, sitemap, _headers, images/
 
 // ---------- safety: nothing private may reach the public files
 const pub = html + read('src/data.js');

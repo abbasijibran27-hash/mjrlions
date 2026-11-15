@@ -116,8 +116,15 @@
 
   /* ------------------------------------------------------------ visuals */
   function viz(svc, extra) {
-    const img = CFG.IMAGES['svc-' + svc.id];
-    return `<div class="viz ${extra || ''}" data-art="${esc(svc.art)}">${img ? `<img src="${esc(img)}" alt="${esc(svc.name)} — ${esc(svc.art)}" loading="lazy">` : `<div class="vz-art">${VIS.ART[svc.icon]}</div><span class="vz-chip">${esc(svc.chip)}</span>`}<span class="shine"></span><span class="vz-slot">Image slot · ${esc(svc.art)}</span></div>`;
+    const img = CFG.IMAGES['svc-' + svc.id], pos = (CFG.IMAGE_POS || {})['svc-' + svc.id];
+    let tag = '';
+    if (img) {
+      const alt = `${svc.name} by MJR LION AGENCY`, st = pos ? ` style="object-position:${esc(pos)}"` : '';
+      tag = /\.(webp|avif|jpe?g|png)(\?|$)/i.test(img)
+        ? `<img src="${esc(img)}" alt="${esc(alt)}" loading="lazy" decoding="async"${st}>`
+        : `<img src="${esc(img)}-1600.webp" srcset="${esc(img)}-960.webp 960w, ${esc(img)}-1600.webp 1600w" sizes="(max-width:760px) 100vw, (max-width:1100px) 50vw, 40vw" width="1600" height="901" alt="${esc(alt)}" loading="lazy" decoding="async"${st}>`;
+    }
+    return `<div class="viz ${extra || ''}${img ? ' has-img' : ''}" data-art="${esc(svc.art)}">${img ? tag : `<div class="vz-art">${VIS.ART[svc.icon]}</div><span class="vz-chip">${esc(svc.chip)}</span><span class="vz-slot">Image slot · ${esc(svc.art)}</span>`}<span class="shine"></span></div>`;
   }
   function photo(key, mono, name) {
     const src = CFG.TEAM_PHOTOS[key];

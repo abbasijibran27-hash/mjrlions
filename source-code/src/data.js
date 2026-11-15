@@ -8,10 +8,12 @@ window.SITE_CONFIG = {
   /* Replaceable photography. Put an image URL (or data: URI) against any key
      and it replaces the art-directed placeholder automatically. */
   IMAGES: {
-    'svc-web-development': '', 'svc-social-media-management': '', 'svc-performance-marketing': '',
+    'svc-web-development': 'images/services/web-development-8ceb51f6', 'svc-social-media-management': '', 'svc-performance-marketing': '',
     'svc-graphic-design': '', 'svc-video-editing': '', 'svc-ai-videos': '', 'svc-ugc-production': '',
     'svc-content-writing': '', 'svc-lead-generation': '', 'svc-ai-content-creation': ''
   },
+  /* focus point of each photo inside its frame (CSS object-position) */
+  IMAGE_POS: { 'svc-web-development': '70% 50%' },
   TEAM_PHOTOS: { mjr: '', sana: '', roma: '', wasi: '', wahab: '', husnain: '', jamshaid: '' },
   /* MJR showreel — add video URLs (mp4/webm) to play real edits in the profile */
   SHOWREEL: ['', '', '', '', '', ''],
