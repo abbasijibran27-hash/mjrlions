@@ -208,7 +208,7 @@
   }
   function closeOverlays(only) {
     [sheet, $('#adminModal')].filter(Boolean).forEach(o => { if (!only || o === only) o.classList.remove('open'); });
-    if (!$('.sheet.open,.modal.open') && !document.body.classList.contains('menu-open')) document.body.classList.remove('locked');
+    if (!$('.sheet.open,.modal.open')) document.body.classList.remove('locked');
     if (lastFocus && lastFocus.focus && !only) lastFocus.focus({ preventScroll: true });
   }
   document.addEventListener('click', e => {
@@ -218,7 +218,7 @@
     if (ov && !(ov.id === 'modal' && e.target.closest('[data-explore]'))) closeOverlays(ov);
     else if (ov) { ov.classList.remove('open'); }
   });
-  addEventListener('keydown', e => { if (e.key === 'Escape') { closeOverlays(); setMenu(false); } });
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlays(); });
 
   /* ------------------------------------------------------------ PRICING */
   $('#priceGrid').innerHTML = PRICING.map((p, i) => `
@@ -734,9 +734,12 @@
   }
 
   /* ------------------------------------------------------------ menu */
-  function setMenu(open) { document.body.classList.toggle('menu-open', open); $('#burger').setAttribute('aria-expanded', open); $('#burger').setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); document.body.classList.toggle('locked', open); }
-  $('#burger').addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
-  $$('#mnav a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  // keep the active page visible in the one-line menu on small screens
+  function revealActiveNav() {
+    const nav = $('.nav'), a = $('.nav a.on:not(.btn)');
+    if (!nav || !a || nav.scrollWidth <= nav.clientWidth) return;
+    nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2, behavior: reduced ? 'auto' : 'smooth' });
+  }
 
   /* ------------------------------------------------------------ router */
   let current = null, pendingScroll = null, pendingMember = null, navTimer = null;
@@ -747,6 +750,7 @@
     current = name;
     $$('[data-nav]').forEach(a => { const on = a.dataset.nav === name; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
     document.title = PAGES[name].title;
+    revealActiveNav();
     if (gl3d) gl3d.go(shapeFor(name), placement(name), { duration: name === 'home' ? 2.3 : 1.9 });
     const show = () => {
       if (prev) prev.classList.remove('active', 'leave', 'enter');
