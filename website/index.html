@@ -55,6 +55,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input,select,textarea{font:inherit;color:inherit}
 ::selection{background:rgba(214,178,110,.35);color:#fff}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+[hidden]{display:none!important}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:fixed;left:16px;top:-60px;z-index:200;background:var(--gold);color:#111;padding:10px 16px;border-radius:10px;font-weight:600}
 .skip:focus{top:16px}
@@ -1020,7 +1021,7 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
         <div class="side-box glass">
           <div class="label">Official channel</div>
           <p>Every post here is published by the MJR LION owner or an authorised MJR admin.</p>
-          <button class="btn btn-ghost btn-sm" type="button" id="adminBtn">Admin Login</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="adminBtn" hidden>Admin Panel</button>
         </div>
         <div class="side-box glass">
           <div class="label">Questions about an offer?</div>
@@ -1096,7 +1097,7 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
       <div><h4>Reach us</h4><div class="cl" id="ftrContact"></div></div>
     </div>
     <div class="ftr-word" aria-hidden="true">MJR LION</div>
-    <div class="ftr-bot"><span>© <span id="yr">2026</span> MJR LION AGENCY. All rights reserved.</span><span>Premium Social Media Marketing &amp; Digital Growth Agency · <a href="#portal" style="color:inherit">Admin Portal</a></span></div>
+    <div class="ftr-bot"><span>© <span id="yr">2026</span> MJR LION AGENCY. All rights reserved.</span><span>Premium Social Media Marketing &amp; Digital Growth Agency</span></div>
   </div>
 </footer>
 
@@ -2562,8 +2563,8 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       `<div class="feed-empty glass"><b>${US.posts.length ? 'Nothing in this category yet.' : 'No updates yet.'}</b>New offers, partnerships and announcements will appear here.</div>`;
   }
   function renderComposer() {
-    if (!US.me) { compEl.innerHTML = ''; $('#adminBtn').textContent = 'Admin Login'; return; }
-    $('#adminBtn').textContent = 'Admin Panel';
+    $('#adminBtn').hidden = !US.me; // admin controls are invisible to visitors
+    if (!US.me) { compEl.innerHTML = ''; return; }
     compEl.innerHTML = `<form class="composer glass" id="cmForm" novalidate>
       <div class="cm-top"><div class="post-av">${VIS.lionMark('pa-me')}</div><div><b>${esc(US.me.name)}</b><small>${esc(US.me.role === 'owner' ? 'Owner' : (US.me.title || 'Admin'))} · posting as MJR LION AGENCY</small></div>
         <div class="cm-act"><button class="btn btn-ghost btn-sm" type="button" data-admin-open>Admin Panel</button></div></div>

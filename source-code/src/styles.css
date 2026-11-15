@@ -28,6 +28,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input,select,textarea{font:inherit;color:inherit}
 ::selection{background:rgba(214,178,110,.35);color:#fff}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+[hidden]{display:none!important}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:fixed;left:16px;top:-60px;z-index:200;background:var(--gold);color:#111;padding:10px 16px;border-radius:10px;font-weight:600}
 .skip:focus{top:16px}

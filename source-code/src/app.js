@@ -443,8 +443,8 @@
       `<div class="feed-empty glass"><b>${US.posts.length ? 'Nothing in this category yet.' : 'No updates yet.'}</b>New offers, partnerships and announcements will appear here.</div>`;
   }
   function renderComposer() {
-    if (!US.me) { compEl.innerHTML = ''; $('#adminBtn').textContent = 'Admin Login'; return; }
-    $('#adminBtn').textContent = 'Admin Panel';
+    $('#adminBtn').hidden = !US.me; // admin controls are invisible to visitors
+    if (!US.me) { compEl.innerHTML = ''; return; }
     compEl.innerHTML = `<form class="composer glass" id="cmForm" novalidate>
       <div class="cm-top"><div class="post-av">${VIS.lionMark('pa-me')}</div><div><b>${esc(US.me.name)}</b><small>${esc(US.me.role === 'owner' ? 'Owner' : (US.me.title || 'Admin'))} · posting as MJR LION AGENCY</small></div>
         <div class="cm-act"><button class="btn btn-ghost btn-sm" type="button" data-admin-open>Admin Panel</button></div></div>
