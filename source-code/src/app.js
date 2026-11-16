@@ -9,6 +9,8 @@
   const CFG = window.SITE_CONFIG, VIS = window.VIS;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = window.matchMedia('(pointer: fine)').matches;
+  // router state — declared first so nothing can touch it before it exists
+  let current = null, pendingScroll = null, pendingMember = null, navTimer = null;
   const isMobile = () => window.innerWidth < 760 || window.innerWidth / window.innerHeight < .8;
 
   document.body.insertAdjacentHTML('afterbegin', VIS.DEFS);
@@ -771,7 +773,6 @@
   }
 
   /* ------------------------------------------------------------ router */
-  let current = null, pendingScroll = null, pendingMember = null, navTimer = null;
   function route(name, first) {
     if (!PAGES[name]) name = 'home';
     if (name === current) { if (!pendingScroll) scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); afterRoute(); return; }
@@ -847,13 +848,7 @@
     setTimeout(() => intro.remove(), 650);
   }
   $('#skipIntro').addEventListener('click', endIntro);
-  let seen = false;
-  try { // intro plays at most once every 12 hours per browser
-    const last = +localStorage.getItem('mjr-intro') || 0;
-    seen = Date.now() - last < 12 * 3600e3;
-    if (!seen) localStorage.setItem('mjr-intro', String(Date.now()));
-  } catch (e) { }
-  if (reduced || seen) { endIntro(); }
+  if (reduced) { endIntro(); }
   else {
     if (gl3d) gl3d.go('galaxy', { x: 0, y: 0, s: isMobile() ? .55 : .95, o: .85, tilt: 0, spin: .35 }, { duration: 1.4, scatter: .4 });
     requestAnimationFrame(() => setTimeout(() => $('#intro').classList.add('play'), 60));
@@ -864,4 +859,5 @@
   if (gl3d) gl3d.prewarm(['embers', 'lion', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe']);
   enhance($('#ftr'));
   onScroll();
+  window.__mjrReady = true;
 })();

@@ -48,6 +48,23 @@
   <button class="skip-intro" id="skipIntro" type="button">Skip Intro →</button>
   <div class="i-bar"></div>
 </div>
+<script>
+/* Safety net: if anything ever stops the site from starting, never leave visitors on a dark screen */
+(function () {
+  function rescue() {
+    var i = document.getElementById('intro');
+    if (!i || window.__mjrReady) return;
+    i.remove(); document.body.classList.remove('intro-on');
+    var h = document.getElementById('hdr'); if (h) h.classList.remove('pre');
+    var p = document.getElementById('page-' + (location.hash.slice(1) || 'home')) || document.getElementById('page-home');
+    if (p) p.classList.add('active');
+    document.querySelectorAll('[data-r],.split').forEach(function (e) { e.classList.add('in'); });
+  }
+  window.addEventListener('error', function () { setTimeout(rescue, 60); });
+  document.getElementById('skipIntro').addEventListener('click', function () { setTimeout(rescue, 250); });
+  setTimeout(rescue, 7000);
+})();
+</script>
 
 <!-- ============ HEADER ============ -->
 <header class="hdr pre" id="hdr">
