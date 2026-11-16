@@ -214,7 +214,7 @@
     setTimeout(() => $('.sheet-close', sheetPanel).focus({ preventScroll: true }), 50);
   }
   function closeOverlays(only) {
-    [sheet, $('#adminModal')].filter(Boolean).forEach(o => { if (!only || o === only) o.classList.remove('open'); });
+    [sheet, $('#adminModal'), $('#leadModal')].filter(Boolean).forEach(o => { if (!only || o === only) o.classList.remove('open'); });
     if (!$('.sheet.open,.modal.open') && !document.body.classList.contains('menu-open')) document.body.classList.remove('locked');
     if (lastFocus && lastFocus.focus && !only) lastFocus.focus({ preventScroll: true });
   }
@@ -241,38 +241,126 @@
   /* ------------------------------------------------------------ CONTACT */
   const C = window.CONTACT;
   const tel = n => `<a href="tel:${n.replace(/\s/g, '')}">${esc(n)}</a>`;
+  const mail = m => m.includes('@') ? `<a href="mailto:${esc(m)}">${esc(m)}</a>` : esc(m);
   $('#cGrid').innerHTML = [
-    { i: 'mail', l: 'Email', v: C.emails.map(esc).join('<br>') },
+    { i: 'mail', l: 'Email', v: C.emails.map(mail).join('<br>') },
     { i: 'phone', l: 'Helpline', v: C.helpline.map(tel).join('<br>') },
     { i: 'alert', l: 'Complaints', v: C.complaints.map(tel).join('<br>') }
-  ].map((c, i) => `<div class="c-card tilt" data-r style="--d:${i * .08}s"><div class="c-ico z2">${VIS.icon(c.i)}</div><div class="label z1">${c.l}</div><div class="v z2">${c.v}</div></div>`).join('');
-  $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(esc).join('<br>')}</div>`;
+  ].map((c, i) => `<div class="c-card tilt" data-r style="--d:${i * .08}s"><div class="c-ico z2">${VIS.icon(c.i)}</div><div class="label z1">${c.l}</div><div class="v z2">${c.v}</div>${c.i === 'alert' ? '<button class="btn btn-ghost btn-sm c-act z2" type="button" data-complaint>File a Complaint <span class="arr">→</span></button>' : ''}</div>`).join('');
+  $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(mail).join('<br>')}</div>`;
   $('#vLockIco').innerHTML = VIS.icon('lock'); $('#tLockIco').innerHTML = VIS.icon('key');
-  const sel = $('#f-svc');
-  sel.innerHTML = `<option value="">Select a service…</option>${SERVICES.map(s => `<option>${esc(s.name)}</option>`).join('')}<option>All-in-One Standard Brand Program</option><option>All-in-One Premium Brand Program</option><option>Not sure yet — advise me</option>`;
+  /* ---------- project / complaint form (contact page + popup everywhere) */
+  const SVC_OPTS = SERVICES.map(s => s.name).concat(['All-in-One Standard Brand Program', 'All-in-One Premium Brand Program', 'Not sure yet — advise me']);
+  function formHTML(px) {
+    return `
+      <fieldset class="qtype full"><legend class="sr">What is this about?</legend>
+        <label><input type="radio" name="type" value="inquiry" checked><span>New project / Inquiry</span></label>
+        <label><input type="radio" name="type" value="complaint"><span>Complaint</span></label>
+      </fieldset>
+      <div class="fld"><label for="${px}-name">Name</label><input id="${px}-name" name="name" autocomplete="name" maxlength="100" required><span class="err"></span></div>
+      <div class="fld"><label for="${px}-email">Email</label><input id="${px}-email" name="email" type="email" autocomplete="email" maxlength="160" required><span class="err"></span></div>
+      <div class="fld"><label for="${px}-phone">Phone / WhatsApp</label><input id="${px}-phone" name="phone" type="tel" autocomplete="tel" maxlength="40"><span class="err"></span></div>
+      <div class="fld"><label for="${px}-company">Company</label><input id="${px}-company" name="company" autocomplete="organization" maxlength="120"><span class="err"></span></div>
+      <div class="fld full"><label for="${px}-svc" data-svc-label>Service interested in</label><select id="${px}-svc" name="service"><option value="">Select a service…</option>${SVC_OPTS.map(o => `<option>${esc(o)}</option>`).join('')}</select><span class="err"></span></div>
+      <div class="fld full only-complaint" hidden><label for="${px}-proj">Project / Tracking ID (optional)</label><input id="${px}-proj" name="project" maxlength="40" placeholder="e.g. MJR-PRJ-7K4P-Q9XD"><span class="err"></span></div>
+      <div class="fld full"><label for="${px}-msg" data-msg-label>Message</label><textarea id="${px}-msg" name="message" maxlength="4000" required placeholder="Your goals, timeline and budget range…"></textarea><span class="err"></span></div>
+      <div class="hp" aria-hidden="true"><label for="${px}-web">Website</label><input id="${px}-web" name="website" tabindex="-1" autocomplete="off"></div>
+      <div class="actions"><button class="btn btn-gold" type="submit">Submit <span class="arr">→</span></button><span class="muted f-note" style="font-size:13px">We reply to every message within 24 hours.</span></div>
+      <div class="f-alert" role="alert" hidden></div>`;
+  }
+  let formCfg = null;
+  async function getFormCfg() {
+    if (formCfg) return formCfg;
+    try { const r = await fetch('/api/form-config'); const j = await r.json(); if (j && j.ok) formCfg = j; } catch (e) { }
+    return formCfg || { services: '', complaints: '' };
+  }
+  async function deliverEmail(type, d, ref) {
+    // email copy straight to the right MJR inbox (services vs complaints) — the visitor never sees where it goes
+    const cfg = await getFormCfg(), key = type === 'complaint' ? cfg.complaints : cfg.services;
+    if (!key) return false;
+    const subject = type === 'complaint' ? `Complaint ${ref} — ${d.name}` : `New inquiry ${ref} — ${d.service || 'General'} — ${d.name}`;
+    try {
+      const r = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify({ access_key: key, subject, from_name: 'MJR LION AGENCY Website', replyto: d.email, 'Reference': ref, 'Type': type === 'complaint' ? 'Complaint' : 'New project / Inquiry', 'Name': d.name, 'Email': d.email, 'Phone': d.phone || '—', 'Company': d.company || '—', 'Service': d.service || '—', 'Project ID': d.project || '—', 'Message': d.message, botcheck: '' }) });
+      const j = await r.json().catch(() => ({}));
+      return !!j.success;
+    } catch (e) { return false; }
+  }
+  function setType(form, type) {
+    const c = type === 'complaint';
+    $('[data-svc-label]', form).textContent = c ? 'Related service (optional)' : 'Service interested in';
+    $('[data-msg-label]', form).textContent = c ? 'Describe the issue' : 'Message';
+    form.elements.message.placeholder = c ? 'What went wrong, and when? We take every complaint seriously.' : 'Your goals, timeline and budget range…';
+    $('.only-complaint', form).hidden = !c;
+    form.classList.toggle('is-complaint', c);
+  }
+  function bindForm(form, px) {
+    form.innerHTML = formHTML(px);
+    form.addEventListener('change', e => { if (e.target.name === 'type') setType(form, e.target.value); });
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (form.dataset.busy) return;
+      const v = n => (form.elements[n] ? form.elements[n].value.trim() : '');
+      const type = (form.querySelector('input[name=type]:checked') || {}).value === 'complaint' ? 'complaint' : 'inquiry';
+      const rules = { name: v('name').length > 1 || 'Please enter your name.', email: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email')) || 'Please enter a valid email address.', service: type === 'complaint' || !!v('service') || 'Please choose a service.', message: v('message').length >= 10 || 'Please write a little more (at least 10 characters).' };
+      let ok = true, first = null;
+      Object.entries(rules).forEach(([k, r]) => { const f = form.elements[k].closest('.fld'); f.classList.toggle('bad', r !== true); $('.err', f).textContent = r === true ? '' : r; if (r !== true) { ok = false; first = first || form.elements[k]; } });
+      if (!ok) { form.classList.add('shake'); setTimeout(() => form.classList.remove('shake'), 500); first.focus(); return; }
+      const d = { type, name: v('name'), email: v('email'), phone: v('phone'), company: v('company'), service: v('service'), project: v('project'), message: v('message'), website: v('website'), page: current || '' };
+      const btn = $('button[type=submit]', form), alertEl = $('.f-alert', form);
+      form.dataset.busy = '1'; btn.disabled = true; btn.innerHTML = 'Sending… <span class="spin"></span>'; alertEl.hidden = true;
+      let res = null;
+      try { const r = await fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(d) }); res = { status: r.status, data: await r.json().catch(() => ({})) }; } catch (err) { res = { status: 0, data: {} }; }
+      let ref = res.data && res.data.ok ? res.data.ref : null;
+      const mailed = d.website ? true : await deliverEmail(type, d, ref || 'MJR-WEB');
+      delete form.dataset.busy; btn.disabled = false; btn.innerHTML = 'Submit <span class="arr">→</span>';
+      if (!ref && !mailed) {
+        alertEl.hidden = false;
+        alertEl.textContent = res.status === 429 ? 'You have sent several messages in a short time. Please wait a few minutes and try again.' : 'We couldn’t send your message right now. Please check your internet connection and try again.';
+        return;
+      }
+      ref = ref || 'Received';
+      const first2 = esc(d.name.split(' ')[0]);
+      form.innerHTML = `<div class="f-done full" role="status">
+        <div class="f-tick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h3>${type === 'complaint' ? `Thank you, ${first2}. Your complaint has been received.` : `Thank you, ${first2}! Your message has been received.`}</h3>
+        <p>${type === 'complaint' ? 'We’re sorry for the trouble. Our complaints team will review it and contact you' : 'Our team will review your request and get back to you'} at <b>${esc(d.email)}</b> within 24 hours.</p>
+        <div class="f-ref">Reference: <b>${esc(ref)}</b></div>
+        <button class="btn btn-ghost btn-sm" type="button" data-again>Send another message</button></div>`;
+      $('[data-again]', form).onclick = () => { bindForm(form, px); const f = form.elements.name; f && f.focus(); };
+      if (!form.closest('.modal')) form.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+    });
+  }
+  const pageForm = $('#brief'), leadForm = $('#leadForm'), leadModal = $('#leadModal');
+  bindForm(pageForm, 'f'); bindForm(leadForm, 'lm');
+  function presetForm(form, opts) {
+    if (!form.elements.name) bindForm(form, form === leadForm ? 'lm' : 'f');      // fresh form after a previous success
+    const t = opts.type || 'inquiry';
+    const r = form.querySelector(`input[name=type][value=${t}]`); if (r) { r.checked = true; setType(form, t); }
+    if (opts.service) form.elements.service.value = opts.service;
+  }
+  function openLead(opts) {
+    lastFocus = document.activeElement;
+    presetForm(leadForm, opts);
+    const c = opts.type === 'complaint';
+    $('#leadKicker').textContent = c ? 'Complaints' : (opts.service ? opts.service : 'Start your project');
+    $('#leadTitle').textContent = c ? 'Tell us what went wrong' : 'Tell us about your project';
+    $('#leadSub').textContent = c ? 'Your complaint goes straight to our complaints team. We reply within 24 hours.' : 'Share a few details. Our team replies within 24 hours.';
+    leadModal.classList.add('open'); document.body.classList.add('locked');
+    setTimeout(() => { const f = leadForm.elements.name; f && f.focus({ preventScroll: true }); }, 80);
+  }
   document.addEventListener('click', e => {
-    const a = e.target.closest('[data-svc],[data-plan]');
-    if (a && a.getAttribute('href') === '#contact') { const v = a.dataset.plan || (SVC[a.dataset.svc] || {}).name; if (v) { sel.value = v; pendingScroll = 'brief'; } }
+    const a = e.target.closest('[data-svc],[data-plan],[data-complaint]');
+    if (a && (a.getAttribute('href') === '#contact' || a.hasAttribute('data-complaint'))) {
+      e.preventDefault();
+      if (a.closest('.sheet')) closeOverlays($('#sheet'));
+      openLead({ service: a.dataset.plan || (SVC[a.dataset.svc] || {}).name || '', type: a.hasAttribute('data-complaint') ? 'complaint' : 'inquiry' });
+      return;
+    }
     const m = e.target.closest('[data-member]');
     if (m) pendingMember = m.dataset.member;
     const sc = e.target.closest('[data-scrollto]');
     if (sc && current === 'contact') { e.preventDefault(); $('#' + sc.dataset.scrollto).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); }
-  });
-
-  const form = $('#brief');
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const v = n => form.elements[n].value.trim();
-    const rules = { name: v('name').length > 1 || 'Please enter your name.', email: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email')) || 'Please enter a valid email.', service: !!v('service') || 'Please choose a service.', message: v('message').length >= 10 || 'Tell us a little more (10+ characters).' };
-    let ok = true;
-    Object.entries(rules).forEach(([k, r]) => { const f = form.elements[k].closest('.fld'); f.classList.toggle('bad', r !== true); $('.err', f).textContent = r === true ? '' : r; if (r !== true) ok = false; });
-    if (!ok) { form.classList.add('shake'); setTimeout(() => form.classList.remove('shake'), 500); return; }
-    const brief = `New project brief — MJR LION AGENCY\n\nName: ${v('name')}\nEmail: ${v('email')}\nPhone: ${v('phone') || '—'}\nCompany: ${v('company') || '—'}\nService: ${v('service')}\n\nMessage:\n${v('message')}`;
-    const sent = $('#sent');
-    sent.innerHTML = `<div class="label" style="color:var(--ok)">Brief ready</div><div>Thanks, ${esc(v('name').split(' ')[0])}. Your brief is ready — send it to our team on WhatsApp in one tap, or copy it.</div><pre>${esc(brief)}</pre><div class="row"><a class="btn btn-gold btn-sm" href="https://wa.me/${C.whatsapp}?text=${encodeURIComponent(brief)}" target="_blank" rel="noopener">Send via WhatsApp <span class="arr">→</span></a><button class="btn btn-ghost btn-sm" type="button" id="copyBrief">Copy brief</button></div>`;
-    sent.classList.add('show');
-    $('#copyBrief').onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(brief) : Promise.reject()).then(() => toast('Brief copied to clipboard'), () => toast('Select the text above to copy it')); };
-    sent.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
   });
   function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2600); }
 
@@ -565,10 +653,15 @@
     }
     const owner = US.me.role === 'owner';
     adminPanel.innerHTML = `${close}<div class="admin-body"><div class="label">${owner ? 'Owner' : 'Admin'} panel</div><h3>${esc(US.me.name)}</h3>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-gold btn-sm" href="#updates" data-close>Write a Post</a><a class="btn btn-ghost btn-sm" href="#portal" data-close>Project Portal</a><button class="btn btn-ghost btn-sm" type="button" id="lgOut">Log Out</button></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-gold btn-sm" href="#updates" data-close>Write a Post</a><a class="btn btn-ghost btn-sm" href="#portal" data-close>Project Portal</a><a class="btn btn-ghost btn-sm" href="#portal" data-close data-inbox>Inbox</a><button class="btn btn-ghost btn-sm" type="button" id="lgOut">Log Out</button></div>
       ${owner ? `<hr><div class="label">Admins who can post</div><div class="ad-list" id="adList"><div class="muted" style="font-size:14px">Loading…</div></div>
         <form id="adForm"><div class="cm-row" style="grid-template-columns:1fr 1fr"><label class="sr" for="adN">Name</label><input class="fi" id="adN" placeholder="Member name" maxlength="60"><label class="sr" for="adT">Role</label><input class="fi" id="adT" placeholder="Role, e.g. Marketing Manager" maxlength="60"></div>
-        <button class="btn btn-ghost btn-sm" type="submit">Make Admin</button><div id="adMsg"></div></form>` : ''}
+        <button class="btn btn-ghost btn-sm" type="submit">Make Admin</button><div id="adMsg"></div></form>
+        <hr><div class="label">Website form emails</div>
+        <p class="mk-help">Every message from the website is saved in your <b>Inbox</b>. To also get it by email, paste a free access key from <a href="https://web3forms.com" target="_blank" rel="noopener">web3forms.com</a> for each Gmail: <b>New project / Inquiry</b> messages go to the Services email, <b>Complaints</b> go to the Complaints email. Visitors never see these addresses.</p>
+        <form id="mkForm"><label class="sr" for="mkS">Services email key</label><input class="fi" id="mkS" placeholder="Services email — access key" maxlength="40" autocomplete="off" spellcheck="false">
+        <label class="sr" for="mkC">Complaints email key</label><input class="fi" id="mkC" placeholder="Complaints email — access key" maxlength="40" autocomplete="off" spellcheck="false">
+        <button class="btn btn-ghost btn-sm" type="submit">Save Email Keys</button><div class="v-msg" id="mkMsg" role="status"></div></form>` : ''}
       <hr><div class="label">Change password</div>
       <form id="pwForm"><label class="sr" for="pwC">Current password</label><input class="fi" id="pwC" type="password" autocomplete="current-password" placeholder="Current password">
       <label class="sr" for="pwN">New password</label><input class="fi" id="pwN" type="password" autocomplete="new-password" placeholder="New password (10+ characters)">
@@ -596,6 +689,16 @@
       const r = await uapi('/api/admin/users/' + encodeURIComponent(b.dataset.rm), 'DELETE');
       if (r.data.ok) { toast('Admin removed'); list(); } else toast(errText(r));
     };
+    uapi('/api/admin/settings').then(r => { if (r.data.ok && $('#mkS')) { $('#mkS').value = r.data.settings.w3f_services || ''; $('#mkC').value = r.data.settings.w3f_complaints || ''; } });
+    $('#mkForm').onsubmit = async e => {
+      e.preventDefault();
+      const m = $('#mkMsg'); m.className = 'v-msg'; m.textContent = 'Saving…';
+      const r = await uapi('/api/admin/settings', 'POST', { w3f_services: $('#mkS').value.trim(), w3f_complaints: $('#mkC').value.trim() });
+      if (r.status === 401) return logout(true);
+      m.className = 'v-msg ' + (r.data.ok ? 'ok' : 'err');
+      m.textContent = r.data.ok ? 'Saved. New website messages will now also arrive by email.' : (r.data.error === 'key_format' ? 'That doesn’t look like an access key (format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).' : errText(r));
+      if (r.data.ok) formCfg = null;
+    };
     $('#adForm').onsubmit = async e => {
       e.preventDefault();
       const m = $('#adMsg');
@@ -610,7 +713,12 @@
 
   /* ------------------------------------------------------------ PROJECT PORTAL (owner / admins) */
   const portalEl = $('#portal');
-  const PJ = { list: [], q: '' };
+  const PJ = { list: [], q: '', tab: 'projects', inbox: [], ibf: 'all' };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href="#portal"]'); if (!a) return;
+    PJ.tab = a.hasAttribute('data-inbox') ? 'inbox' : 'projects';
+    if (current === 'portal') setTimeout(renderPortal, 0);
+  }, true);
   const STAGE_LIST = ['Booked', 'In Progress', 'Review', 'Revision', 'Finalization', 'Completed'];
   const SVC_NAMES = SERVICES.map(s => s.name).concat(['All-in-One Standard Brand Program', 'All-in-One Premium Brand Program']);
   const TEAM_NAMES = ['MJR (Mr. Jibran)', 'Ms. Sana Salahuddin', 'Ms. Roma', 'Mr. Wasi Mughal', 'Mr. Wahab Haider', 'Mr. Husnain Abbasi', 'Mr. Jamshaid Abbasi'];
@@ -623,7 +731,8 @@
       bindLogin('pl', () => renderPortal());
       return;
     }
-    portalEl.innerHTML = `
+    if (PJ.tab === 'inbox') return renderInbox();
+    portalEl.innerHTML = `${tabsHTML()}
       <div class="pj-bar glass"><div><div class="label">${US.me.role === 'owner' ? 'Owner' : 'Admin'}</div><b>${esc(US.me.name)}</b></div>
         <label class="sr" for="pjQ">Search projects</label><input class="fi" id="pjQ" placeholder="Search by client, tracking ID or service…" value="${esc(PJ.q)}">
         <button class="btn btn-gold btn-sm" type="button" id="pjNew">+ New Project</button><button class="btn btn-ghost btn-sm" type="button" data-admin-open>Admin Panel</button></div>
@@ -636,7 +745,74 @@
     if (!r.data.ok) { $('#pjList').innerHTML = `<div class="feed-empty glass"><b>Projects couldn’t load.</b>${esc(errText(r))}</div>`; return; }
     PJ.list = r.data.projects || [];
     renderProjects();
+    refreshUnread();
   }
+  /* ---------- inbox: every website form message (inquiries + complaints) */
+  const unreadN = () => PJ.inbox.filter(m => !m.read).length;
+  function tabsHTML() {
+    const n = unreadN();
+    return `<div class="pj-tabs" role="tablist"><button type="button" role="tab" aria-selected="${PJ.tab === 'projects'}" data-tab="projects">Projects</button><button type="button" role="tab" aria-selected="${PJ.tab === 'inbox'}" data-tab="inbox">Inbox${n ? `<span class="cnt">${n}</span>` : ''}</button></div>`;
+  }
+  async function refreshUnread() {
+    const r = await uapi('/api/admin/inbox'); if (!r.data.ok) return;
+    PJ.inbox = r.data.messages || [];
+    const t = $('.pj-tabs', portalEl); if (t) t.outerHTML = tabsHTML();
+  }
+  portalEl.addEventListener('click', e => { const t = e.target.closest('[data-tab]'); if (t && t.dataset.tab !== PJ.tab) { PJ.tab = t.dataset.tab; renderPortal(); } });
+  async function renderInbox() {
+    portalEl.innerHTML = `${tabsHTML()}<div class="pj-bar glass"><div><div class="label">Website messages</div><b>Inquiries &amp; complaints</b></div>
+      <label class="sr" for="ibQ">Search messages</label><input class="fi" id="ibQ" placeholder="Search by name, email, service or reference…" value="${esc(PJ.q)}"></div>
+      <div class="ib-filter" id="ibF"></div><div id="ibList"><div class="sk"></div><div class="sk"></div></div>`;
+    $('#ibQ').oninput = e => { PJ.q = e.target.value; drawInbox(); };
+    const r = await uapi('/api/admin/inbox');
+    if (r.status === 401) return logout(true);
+    if (!r.data.ok) { $('#ibList').innerHTML = `<div class="feed-empty glass"><b>Inbox couldn’t load.</b>${esc(errText(r))}</div>`; return; }
+    PJ.inbox = r.data.messages || [];
+    $('.pj-tabs', portalEl).outerHTML = tabsHTML();
+    drawInbox();
+  }
+  function drawInbox() {
+    const L = PJ.inbox, q = PJ.q.trim().toLowerCase(), f = PJ.ibf, el = $('#ibList'); if (!el) return;
+    const cnt = t => L.filter(m => t === 'all' || (t === 'unread' ? !m.read : m.type === t)).length;
+    $('#ibF').innerHTML = [['all', 'All'], ['unread', 'Unread'], ['inquiry', 'Inquiries'], ['complaint', 'Complaints']].map(([k, l]) => `<button type="button" aria-pressed="${f === k}" data-ibf="${k}">${l} (${cnt(k)})</button>`).join('');
+    const rows = L.filter(m => (f === 'all' || (f === 'unread' ? !m.read : m.type === f)) && (!q || [m.ref, m.name, m.email, m.service, m.preview].join(' ').toLowerCase().includes(q)));
+    el.innerHTML = rows.length ? rows.map(m => `<div class="ib${m.read ? '' : ' unread'}" data-ib="${esc(m.id)}">
+        <button class="ib-h" type="button" aria-expanded="false"><span class="dot" aria-label="${m.read ? 'Read' : 'Unread'}"></span>
+          <div><b>${esc(m.name)} <span class="badge ${m.type === 'complaint' ? 'cmp' : 'stat'}" style="margin-left:6px;padding:.45em .75em;font-size:9px">${m.type === 'complaint' ? 'Complaint' : 'Inquiry'}</span></b><small>${m.service ? esc(m.service) + ' · ' : ''}${esc(m.preview)}</small></div>
+          <time datetime="${new Date(m.at).toISOString()}">${ago(m.at)}</time></button>
+        <div class="ib-body"></div></div>`).join('')
+      : `<div class="feed-empty glass"><b>${L.length ? 'No messages match.' : 'No messages yet.'}</b>${L.length ? '' : 'When someone sends the project or complaint form on the website, it appears here.'}</div>`;
+  }
+  portalEl.addEventListener('click', async e => {
+    const fb = e.target.closest('[data-ibf]'); if (fb) { PJ.ibf = fb.dataset.ibf; drawInbox(); return; }
+    const del = e.target.closest('[data-ibdel]');
+    if (del) {
+      if (!del.classList.contains('arm')) { del.classList.add('arm'); del.textContent = 'Confirm delete'; return; }
+      const r = await uapi('/api/admin/inbox/' + encodeURIComponent(del.dataset.ibdel), 'DELETE');
+      if (r.data.ok) { PJ.inbox = PJ.inbox.filter(x => x.id !== del.dataset.ibdel); toast('Message deleted'); drawInbox(); $('.pj-tabs', portalEl).outerHTML = tabsHTML(); } else toast(errText(r));
+      return;
+    }
+    const h = e.target.closest('.ib-h'); if (!h) return;
+    const card = h.parentElement, id = card.dataset.ib, body = $('.ib-body', card);
+    const open = !card.classList.contains('open');
+    card.classList.toggle('open', open); h.setAttribute('aria-expanded', open);
+    if (!open || body.dataset.loaded) return;
+    body.innerHTML = '<div class="sk"></div>';
+    const r = await uapi('/api/admin/inbox/' + encodeURIComponent(id));
+    if (!r.data.ok) { body.innerHTML = `<div class="cm-msg err">${esc(errText(r))}</div>`; return; }
+    const m = r.data.message; body.dataset.loaded = '1';
+    const subj = encodeURIComponent((m.type === 'complaint' ? 'Re: your complaint ' : 'Re: your inquiry ') + m.ref + ' — MJR LION AGENCY');
+    body.innerHTML = `<div class="ib-meta">${[['Reference', m.ref], ['Email', `<a href="mailto:${esc(m.email)}">${esc(m.email)}</a>`, 1], ['Phone', m.phone ? `<a href="tel:${esc(m.phone.replace(/[^\d+]/g, ''))}">${esc(m.phone)}</a>` : '—', 1], ['Company', m.company || '—'], [m.type === 'complaint' ? 'Related service' : 'Service', m.service || '—'], m.project ? ['Project ID', m.project] : null, ['Received', new Date(m.at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })], m.country ? ['Country', m.country] : null]
+        .filter(Boolean).map(([k, v, raw]) => `<div><span>${k}</span>${raw ? v : esc(v)}</div>`).join('')}</div>
+      <div class="ib-msg">${esc(m.message)}</div>
+      <div class="ib-act"><a class="btn btn-gold btn-sm" href="mailto:${esc(m.email)}?subject=${subj}">Reply by Email <span class="arr">→</span></a>${m.phone ? `<a class="btn btn-ghost btn-sm" href="https://wa.me/${esc(m.phone.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp</a>` : ''}<button class="btn btn-ghost btn-sm" type="button" data-ibdel="${esc(m.id)}">Delete</button></div>`;
+    if (!m.read) {
+      uapi('/api/admin/inbox/' + encodeURIComponent(id), 'PUT', { read: true });
+      const s = PJ.inbox.find(x => x.id === id); if (s) s.read = true;
+      card.classList.remove('unread'); $('.pj-tabs', portalEl).outerHTML = tabsHTML();
+      const ff = $('#ibF'); if (ff) $$('[data-ibf]', ff).forEach(x => { const k = x.dataset.ibf, n = PJ.inbox.filter(m => k === 'all' || (k === 'unread' ? !m.read : m.type === k)).length; x.textContent = x.textContent.replace(/\(\d+\)/, `(${n})`); });
+    }
+  });
   function renderProjects() {
     const L = PJ.list, q = PJ.q.trim().toLowerCase();
     const stats = $('#pjStats'), listEl = $('#pjList');

@@ -8,6 +8,10 @@
                  DELETE /api/posts/:id      (owner/admin)
                  GET  /api/media/:id        (public images)
    Projects:     GET|POST /api/admin/projects, GET|PUT|DELETE /api/admin/projects/:id  (owner/admin; delete = owner)
+   Contact:      POST /api/contact          { type: inquiry|complaint, name, email, ... }  (public, rate-limited)
+                 GET  /api/form-config      (public: which email-delivery keys are active)
+                 GET  /api/admin/inbox, GET|PUT|DELETE /api/admin/inbox/:id   (owner/admin)
+                 GET|POST /api/admin/settings                                (owner)
    Admin:        POST /api/admin/login      { username, password }
                  GET  /api/admin/me
                  POST /api/admin/password   { current, next }
@@ -318,6 +322,75 @@ async function projects(request, env, me, id) {
   return json({ ok: false, error: 'method' }, 405);
 }
 
+/* ---------------------------------------------------------------- contact form → inbox (+ email delivery) */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+async function settings(env) { return (await env.UPDATES.get('settings', 'json')) || {}; }
+async function inboxIndex(env) { return (await env.UPDATES.get('inbox', 'json')) || []; }
+const msgSummary = m => ({ id: m.id, ref: m.ref, type: m.type, name: m.name, email: m.email, service: m.service, preview: m.message.slice(0, 160), at: m.at, read: !!m.read });
+function refCode(type) { const r = rand(6); let s = ''; for (let i = 0; i < 6; i++) s += ID_CHARS[r[i] % ID_CHARS.length]; return 'MJR-' + (type === 'complaint' ? 'C' : 'Q') + '-' + s; }
+async function contact(request, env) {
+  const ip = ipOf(request);
+  if (blocked('c:' + ip)) return json({ ok: false, error: 'rate_limited' }, 429);
+  let b; try { b = await request.json(); } catch { return json({ ok: false, error: 'bad_request' }, 400); }
+  const type = b.type === 'complaint' ? 'complaint' : 'inquiry';
+  if (b.website) return json({ ok: true, ref: refCode(type) });          // honeypot filled → bot: pretend success, store nothing
+  const m = {
+    name: str(b.name, 100), email: str(b.email, 160).toLowerCase(), phone: str(b.phone, 40), company: str(b.company, 120),
+    service: str(b.service, 120), project: str(b.project, 40), message: str(b.message, 4000), page: str(b.page, 40)
+  };
+  if (m.name.length < 2) return json({ ok: false, error: 'name' }, 400);
+  if (!EMAIL_RE.test(m.email)) return json({ ok: false, error: 'email' }, 400);
+  if (m.message.length < 10) return json({ ok: false, error: 'message' }, 400);
+  failed('c:' + ip);                                                     // max 6 messages per 10 minutes per connection
+  const id = Date.now().toString(36) + b64url(rand(4));
+  const rec = { id, ref: refCode(type), type, ...m, country: (request.cf && request.cf.country) || '', at: Date.now(), read: false };
+  if (kvOK(env)) {
+    await env.UPDATES.put('msg:' + id, JSON.stringify(rec));
+    const idx = await inboxIndex(env);
+    idx.unshift(msgSummary(rec));
+    const drop = idx.splice(2000);
+    await env.UPDATES.put('inbox', JSON.stringify(idx));
+    for (const d of drop) await env.UPDATES.delete('msg:' + d.id);
+  }
+  return json({ ok: true, ref: rec.ref, stored: kvOK(env) });
+}
+async function inbox(request, env, me, id) {
+  const M = request.method;
+  if (!id && M === 'GET') return json({ ok: true, messages: await inboxIndex(env) });
+  if (!id) return json({ ok: false, error: 'method' }, 405);
+  const rec = await env.UPDATES.get('msg:' + id, 'json');
+  if (!rec) return json({ ok: false, error: 'not_found' }, 404);
+  if (M === 'GET') return json({ ok: true, message: rec });
+  const idx = await inboxIndex(env);
+  if (M === 'DELETE') {
+    await env.UPDATES.delete('msg:' + id);
+    await env.UPDATES.put('inbox', JSON.stringify(idx.filter(x => x.id !== id)));
+    return json({ ok: true });
+  }
+  if (M === 'PUT') {
+    let b; try { b = await request.json(); } catch { b = {}; }
+    rec.read = b.read !== false;
+    await env.UPDATES.put('msg:' + id, JSON.stringify(rec));
+    const i = idx.findIndex(x => x.id === id); if (i >= 0) { idx[i].read = rec.read; await env.UPDATES.put('inbox', JSON.stringify(idx)); }
+    return json({ ok: true });
+  }
+  return json({ ok: false, error: 'method' }, 405);
+}
+async function siteSettings(request, env, me) {
+  if (me.r !== 'owner') return json({ ok: false, error: 'forbidden' }, 403);
+  const cur = await settings(env);
+  if (request.method === 'GET') return json({ ok: true, settings: { w3f_services: cur.w3f_services || '', w3f_complaints: cur.w3f_complaints || '' } });
+  let b; try { b = await request.json(); } catch { return json({ ok: false, error: 'bad_request' }, 400); }
+  for (const k of ['w3f_services', 'w3f_complaints']) {
+    const v = str(b[k], 60);
+    if (v && !UUID_RE.test(v)) return json({ ok: false, error: 'key_format' }, 400);
+    cur[k] = v;
+  }
+  await env.UPDATES.put('settings', JSON.stringify(cur));
+  return json({ ok: true });
+}
+
 /* ---------------------------------------------------------------- router */
 export default {
   async fetch(request, env, ctx) {
@@ -336,6 +409,11 @@ export default {
         return json({ ok: true, posts: await feed(env) });
       }
       if (p === '/api/admin/login' && M === 'POST') return await login(request, env);
+      if (p === '/api/contact' && M === 'POST') return await contact(request, env);
+      if (p === '/api/form-config' && M === 'GET') {
+        const st = kvOK(env) ? await settings(env) : {};
+        return json({ ok: true, services: st.w3f_services || env.W3F_SERVICES || '', complaints: st.w3f_complaints || env.W3F_COMPLAINTS || '' }, 200, { 'cache-control': 'no-store' });
+      }
 
       // everything below needs a valid owner/admin session
       if (!kvOK(env)) return json({ ok: false, error: 'storage_not_configured' }, 503);
@@ -345,6 +423,9 @@ export default {
       if (p === '/api/admin/password' && M === 'POST') return await changePassword(request, env, me);
       if (p === '/api/admin/users') return await users(request, env, me);
       if (p.startsWith('/api/admin/users/') && M === 'DELETE') return await users(request, env, me, decodeURIComponent(p.slice(17)));
+      if (p === '/api/admin/inbox') return await inbox(request, env, me);
+      if (p.startsWith('/api/admin/inbox/')) return await inbox(request, env, me, p.slice(17).replace(/[^\w-]/g, ''));
+      if (p === '/api/admin/settings') return await siteSettings(request, env, me);
       if (p === '/api/admin/projects') return await projects(request, env, me);
       if (p.startsWith('/api/admin/projects/')) { const pid = projId(decodeURIComponent(p.slice(20))); if (!pid) return json({ ok: false, error: 'not_found' }, 404); return await projects(request, env, me, pid); }
       if (p === '/api/posts' && M === 'POST') return await createPost(request, env, me);

@@ -322,16 +322,7 @@
           <h2 class="h-lg split">Tell us where you want <span class="gold">your brand to go.</span></h2>
           <p class="lead" style="margin-top:22px">Share a few details and we’ll come back with the right plan, timeline and team for your project.</p>
         </div>
-        <form class="form glass" id="brief" novalidate data-r>
-          <div class="fld"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required><span class="err"></span></div>
-          <div class="fld"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required><span class="err"></span></div>
-          <div class="fld"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel"><span class="err"></span></div>
-          <div class="fld"><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization"><span class="err"></span></div>
-          <div class="fld full"><label for="f-svc">Service interested in</label><select id="f-svc" name="service" required></select><span class="err"></span></div>
-          <div class="fld full"><label for="f-msg">Message</label><textarea id="f-msg" name="message" required placeholder="Your goals, timeline and budget range…"></textarea><span class="err"></span></div>
-          <div class="actions"><button class="btn btn-gold" type="submit" data-mag>Submit <span class="arr">→</span></button><span class="muted" style="font-size:13px">We reply to every brief.</span></div>
-          <div class="sent" id="sent" role="status"></div>
-        </form>
+        <form class="form glass" id="brief" novalidate data-r></form>
       </div>
     </div>
   </section>
@@ -362,6 +353,8 @@
 
 <!-- service detail sheet -->
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Service details"><div class="sheet-bg" data-close></div><div class="sheet-panel" id="sheetPanel"></div></div>
+<!-- project / complaint form popup (opens from every "Start project" button) -->
+<div class="modal" id="leadModal" role="dialog" aria-modal="true" aria-label="Start your project"><div class="sheet-bg" data-close></div><div class="modal-panel lead-panel"><button class="sheet-close" type="button" data-close aria-label="Close"></button><div class="lead-head"><div class="label" id="leadKicker">Start your project</div><h3 id="leadTitle">Tell us about your project</h3><p class="muted" id="leadSub">Share a few details. Our team replies within 24 hours.</p></div><form class="form" id="leadForm" novalidate></form></div></div>
 <!-- admin panel (Updates) -->
 <div class="modal" id="adminModal" role="dialog" aria-modal="true" aria-label="Admin"><div class="sheet-bg" data-close></div><div class="modal-panel admin-panel" id="adminPanel"></div></div>
 <div class="toast" id="toast" role="status"></div>
