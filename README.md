@@ -23,4 +23,4 @@ Full 3D agency website, deployed on Cloudflare Workers.
 ## Deploy
 Cloudflare deploy command: `npx wrangler deploy`
 
-Home page lion photo: Rod Long on Unsplash (Unsplash License) — replace via `HERO_LION` in `source-code/src/data.js`.
+Home page lion: animated 3D particle lion (no external image).

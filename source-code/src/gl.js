@@ -462,7 +462,7 @@
 
   const VS = `
 attribute vec3 aFrom, aTo, aCF, aCT, aEF, aET; attribute float aR;
-uniform mat4 uP, uV, uM; uniform float uT, uMorph, uPx, uOpacity, uBreath, uScatter, uWave;
+uniform mat4 uP, uV, uM; uniform float uT, uMorph, uPx, uOpacity, uBreath, uScatter, uWave, uBurst, uMaxPt;
 varying vec3 vC; varying float vA;
 void main(){
   float m = clamp(uMorph*1.55 - aR*.55, 0., 1.);
@@ -471,6 +471,8 @@ void main(){
   vec3 e = mix(aEF, aET, m);
   float mid = sin(m*3.14159);
   p += vec3(sin(aR*41. + uT*.7), cos(aR*29. + uT*.6), sin(aR*23. + 1.7)) * mid * .55 * uScatter;
+  // leap burst: particles fly outward past the viewer, then gather back into the lion
+  p += (normalize(p + vec3(.001, .002, .003)) * (.6 + aR * 1.6) + vec3(sin(aR*91.), cos(aR*57.), sin(aR*33.)) * .7) * uBurst;
   float w = e.z * uWave;
   p.x += sin(uT*1.15 + aR*6.283 + p.y*2.1) * .03 * w;
   p.y += cos(uT*.95 + aR*6.283 + p.x*2.3) * .03 * w;
@@ -479,7 +481,7 @@ void main(){
   vec4 mv = uV * uM * vec4(p, 1.);
   gl_Position = uP * mv;
   float glow = e.y * (.72 + .28*sin(uT*2.1 + aR*3.));
-  gl_PointSize = max(1., e.x * (1. + glow*.9) * uPx * (7. / -mv.z));
+  gl_PointSize = clamp(e.x * (1. + glow*.9) * uPx * (7. / -mv.z), 1., uMaxPt);
   vC = mix(aCF, aCT, m) + glow * vec3(.45, .28, .06);
   float tw = .78 + .22 * sin(uT*2.6 + aR*57.);
   float depth = clamp(1.25 - (-mv.z - 5.5) * .16, .25, 1.15);
@@ -504,7 +506,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     gl.useProgram(prog);
     const A = {}, U = {};
     ['aFrom', 'aTo', 'aCF', 'aCT', 'aEF', 'aET', 'aR'].forEach(n => A[n] = gl.getAttribLocation(prog, n));
-    ['uP', 'uV', 'uM', 'uT', 'uMorph', 'uPx', 'uOpacity', 'uBreath', 'uScatter', 'uWave'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+    ['uP', 'uV', 'uM', 'uT', 'uMorph', 'uPx', 'uOpacity', 'uBreath', 'uScatter', 'uWave', 'uBurst', 'uMaxPt'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
     const cache = {}, waiting = {};
     let pending = null;
@@ -554,7 +556,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       spin: 0, spinSpeed: 0, spinTarget: 0, lion: false,
       mx: 0, my: 0, tmx: 0, tmy: 0, scroll: 0, scrollFade: 1, time: 0, scatter: 1,
       dpr: opts.lowPower ? 1 : Math.min(window.devicePixelRatio || 1, mobile ? 1.3 : 1.5), w: 1, h: 1, last: performance.now(), dirty: true,
-      skip: 0, lowPower: !!opts.lowPower, paused: false, fN: 0, fT: 0
+      leapT: 0, skip: 0, lowPower: !!opts.lowPower, paused: false, fN: 0, fT: 0
     };
 
     function currentBlend() {
@@ -578,6 +580,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       o = o || {};
       if (place) Object.assign(st.tgt, place);
       st.lion = name === 'lion';
+      st.leapT = 1.6;                                   // first leap ~3s after the lion has formed
       st.spinSpeed = (place && place.spin != null) ? place.spin : (st.lion ? 0 : .14);
       if (name === st.shape) { pending = null; st.dirty = true; return; }
       if (!cache[name]) { request(name); pending = { name, place, o }; st.dirty = true; return; }   // morph starts as soon as the worker delivers it
@@ -646,16 +649,31 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       bind(dust);
       gl.uniformMatrix4fv(U.uM, false, model(0, st.scroll * .0012, 0, 0, st.time * .012 + st.mx * .05, 0, 1));
       gl.uniform1f(U.uMorph, 1); gl.uniform1f(U.uOpacity, .55); gl.uniform1f(U.uBreath, 0); gl.uniform1f(U.uScatter, 0); gl.uniform1f(U.uWave, reduced ? 0 : 3);
+      gl.uniform1f(U.uBurst, 0); gl.uniform1f(U.uMaxPt, 14 * st.dpr);
       gl.drawArrays(gl.POINTS, 0, dust.n);
 
       // main sculpture
       bind(main);
+      // lion leap: idle → crouch → jump at the screen → burst past the viewer → re-forms in the distance
+      let LZ = 0, LY = 0, LX = 0, LO = 1, LB = 0;
+      if (st.lion && st.morph >= 1 && !reduced) {
+        if (st.scroll < st.h * .5) st.leapT += dt;
+        const P = 9.5, t = st.leapT % P, sm = k => k * k * (3 - 2 * k);
+        if (t >= 4.6 && t < 5.4) { const k = sm((t - 4.6) / .8); LZ = -.9 * k; LY = -.18 * k; LX = .16 * k; }
+        else if (t >= 5.4 && t < 6.35) {                                   // the jump: accelerates straight at the viewer
+          const k = (t - 5.4) / .95, e = k * k * (1.2 - .2 * k);
+          LZ = -.9 + 5.5 * e; LY = -.18 + Math.sin(Math.PI * k) * .5; LX = .16 - .45 * k;
+          LO = k < .7 ? 1 + .25 * k : 1.18 - (k - .7) / .3 * 1.0; LB = k < .62 ? 0 : (k - .62) / .38 * 1.5;
+        } else if (t >= 6.35 && t < 6.8) { LZ = 4.6; LO = .18 * (1 - (t - 6.35) / .45); LB = 1.5; }
+        else if (t >= 6.8 && t < 8.8) { const k = sm((t - 6.8) / 2); LZ = -4 * (1 - k); LO = k; LB = 1.5 * (1 - k); }
+      }
       const sway = st.lion ? Math.sin(st.time * .32) * .13 : 0;
       const ry = st.spin + sway + st.mx * (st.lion ? .32 : .2) + (st.lion ? 0 : st.scroll * .0007);
-      const rx = st.cur.tilt + st.my * (st.lion ? .16 : .12) + (st.lion ? Math.sin(st.time * .21) * .03 + Math.min(.35, st.scroll * .00025) : 0);
-      gl.uniformMatrix4fv(U.uM, false, model(st.cur.x, st.cur.y + st.scroll * .0009, 0, rx, ry, 0, st.cur.s));
+      const rx = st.cur.tilt + st.my * (st.lion ? .16 : .12) + LX + (st.lion ? Math.sin(st.time * .21) * .03 + Math.min(.35, st.scroll * .00025) : 0);
+      gl.uniformMatrix4fv(U.uM, false, model(st.cur.x * (1 - Math.max(0, LZ) / 5), st.cur.y + LY + st.scroll * .0009, LZ, rx, ry, 0, st.cur.s));
+      gl.uniform1f(U.uBurst, LB);
       gl.uniform1f(U.uMorph, st.morph);
-      gl.uniform1f(U.uOpacity, st.cur.o * st.scrollFade);
+      gl.uniform1f(U.uOpacity, st.cur.o * st.scrollFade * LO);
       gl.uniform1f(U.uBreath, st.lion && !reduced ? 1 : .3);
       gl.uniform1f(U.uScatter, reduced ? 0 : st.scatter);
       gl.uniform1f(U.uWave, reduced ? 0 : 1);

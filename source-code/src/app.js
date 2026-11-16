@@ -40,28 +40,15 @@
   function placement(name) {
     const aspect = window.innerWidth / window.innerHeight, halfW = 2.41 * aspect, P = PAGES[name];
     if (isMobile()) {
-      return name === 'home' ? { x: 0, y: 2.41 * .54 - (aspect > .6 ? .2 : 0), s: Math.min(.5, halfW * .34), o: .9, tilt: 0 } : { x: halfW * .2, y: 1.25, s: Math.min(.55, halfW * .42), o: .32, tilt: P.tilt || 0 };
+      return name === 'home' ? { x: 0, y: .3, s: Math.min(.6, halfW * .5), o: 1.15, tilt: 0 } : { x: halfW * .2, y: 1.25, s: Math.min(.55, halfW * .42), o: .32, tilt: P.tilt || 0 };
     }
-    if (name === 'home') return { x: Math.min(2.05, halfW * .44), y: -.05, s: .86, o: 1, tilt: 0 };
+    if (name === 'home') return { x: Math.min(1.25, halfW * .22), y: -.05, s: 1, o: 1.05, tilt: 0 };   // behind the headline, medium opacity
     if (name === 'team' || name === 'track') return { x: Math.min(3.4, halfW * .78), y: .2, s: .78, o: .38, tilt: P.tilt || 0 };
     return { x: Math.min(2.7, halfW * .6), y: .1, s: .8, o: name === 'pricing' ? .42 : .55, tilt: P.tilt || 0 };
   }
 
-  /* ------------------------------------------------------------ hero lion photo */
-  const heroLion = $('#heroLion'), lionImg = $('#lionImg');
-  let lionPhoto = false;
-  const shapeFor = n => n === 'home' ? (lionPhoto ? 'embers' : 'lion') : PAGES[n].shape;
-  if (heroLion && lionImg && lionImg.getAttribute('src')) {
-    // the photo is requested straight from the HTML (starts downloading before any script runs)
-    const ok = () => {
-      if (lionPhoto) return;
-      lionPhoto = true; heroLion.classList.add('on'); heroLion.parentElement.classList.add('has-photo');
-      if (gl3d && current === 'home') gl3d.go('embers', placement('home'), { duration: 1.6 });
-    };
-    lionImg.onload = ok;
-    lionImg.onerror = () => { heroLion.remove(); };
-    if (lionImg.complete) { if (lionImg.naturalWidth) ok(); else heroLion.remove(); }
-  } else if (heroLion) heroLion.remove();
+  /* home: animated 3D particle lion behind the headline (jumps toward the screen every few seconds) */
+  const shapeFor = n => PAGES[n].shape;
 
   /* ------------------------------------------------------------ text split */
   function split(el) {
@@ -816,23 +803,11 @@
   function onScroll() {
     const y = scrollY;
     hdr.classList.toggle('solid', y > 30);
-    if (heroLion && current === 'home' && y < innerHeight * 1.5) heroLion.style.setProperty('--sy', (y * .22).toFixed(1));
     if (gl3d) gl3d.scroll(y, Math.max(current === 'home' ? .3 : .45, 1 - y / (innerHeight * 1.5)));
   }
   let scrollQueued = false;
   addEventListener('scroll', () => { if (scrollQueued) return; scrollQueued = true; requestAnimationFrame(() => { scrollQueued = false; onScroll(); }); }, { passive: true });
   addEventListener('resize', () => { if (gl3d && current) gl3d.place(placement(current)); });
-  let px = 0, py = 0, ptrQueued = false;
-  if (fine && !reduced && heroLion) addEventListener('pointermove', e => {
-    px = e.clientX; py = e.clientY;
-    if (ptrQueued || current !== 'home' || !heroLion.isConnected) return;
-    ptrQueued = true;
-    requestAnimationFrame(() => {
-      ptrQueued = false;
-      heroLion.style.setProperty('--lx', ((px / innerWidth - .5) * -18).toFixed(1) + 'px');
-      heroLion.style.setProperty('--ly', ((py / innerHeight - .5) * -12).toFixed(1) + 'px');
-    });
-  }, { passive: true });
 
   /* ------------------------------------------------------------ intro */
   const big = $('#introBig');
@@ -856,7 +831,7 @@
     addEventListener('keydown', function k(e) { if (e.key === 'Enter' || e.key === ' ') { endIntro(); removeEventListener('keydown', k); } });
   }
   // build every 3D sculpture in the background worker so page switches never stutter
-  if (gl3d) gl3d.prewarm(['embers', 'lion', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe']);
+  if (gl3d) gl3d.prewarm(['lion', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe']);
   enhance($('#ftr'));
   onScroll();
   window.__mjrReady = true;

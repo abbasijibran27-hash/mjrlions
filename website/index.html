@@ -18,7 +18,6 @@
 <meta name="twitter:title" content="MJR LION AGENCY — Your Success Our Pride">
 <meta name="twitter:description" content="Premium social media marketing & digital growth agency: web, ads, video, AI content, UGC and lead generation.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23050506'/%3E%3Cpath d='M50 18 L68 26 L76 46 L70 64 L60 78 L50 84 L40 78 L30 64 L24 46 L32 26 Z' fill='none' stroke='%23d6b26e' stroke-width='5'/%3E%3Cpath d='M42 64h16l-8 8z' fill='%23d6b26e'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap">
@@ -216,19 +215,10 @@ main{position:relative;z-index:2;overflow-x:clip}
 
 /* ---------- HOME */
 .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:120px 0 90px}
-.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,5,6,.9) 0%,rgba(5,5,6,.6) 38%,rgba(5,5,6,0) 64%)}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 70% at 22% 55%,rgba(5,5,6,.55),rgba(5,5,6,0) 70%)}
 .hero .wrap{position:relative;z-index:2}
 .hero::before{z-index:1}
 .hero-meta{z-index:2}
-.hero-lion{position:absolute;top:0;right:0;bottom:0;width:min(60vw,1040px);z-index:0;pointer-events:none;opacity:0;transition:opacity 1.6s var(--ease);
-  -webkit-mask-image:radial-gradient(ellipse 60% 66% at 56% 46%,#000 34%,rgba(0,0,0,.6) 56%,transparent 80%);mask-image:radial-gradient(ellipse 60% 66% at 56% 46%,#000 34%,rgba(0,0,0,.6) 56%,transparent 80%)}
-.hero-lion.on{opacity:1}
-.hl-move{position:absolute;inset:0;transform:translate3d(var(--lx,0px),calc(var(--ly,0px) + var(--sy,0) * 1px),0);transition:transform 1.4s var(--ease)}
-.hero-lion img{width:100%;height:100%;object-fit:cover;object-position:50% 38%;filter:brightness(.86) contrast(1.12) saturate(.92) sepia(.14);animation:lionBreath 9s ease-in-out infinite;transform-origin:50% 45%;will-change:transform}
-.hl-sweep{position:absolute;top:0;bottom:0;left:-60%;width:220%;background:linear-gradient(105deg,transparent 44%,rgba(255,236,190,.07) 50%,transparent 56%);animation:lionSweep 9s var(--ease2) infinite;will-change:transform}
-.hero-lion::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 50% 55% at 56% 46%,rgba(214,160,80,.08),transparent 70%)}
-@keyframes lionBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.028)}}
-@keyframes lionSweep{0%,55%{transform:translateX(-30%)}100%{transform:translateX(30%)}}
 .hero-copy{max-width:760px}
 .hero-kicker{display:flex;align-items:center;gap:14px;margin-bottom:30px}
 .hero-kicker::before{content:"";width:46px;height:1px;background:var(--gold)}
@@ -752,14 +742,10 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
 @media (max-width:640px){
   body{font-size:15px}
   .hero{align-items:flex-end;padding:110px 0 120px}
-  .hero::before{background:linear-gradient(180deg,rgba(5,5,6,0) 0%,rgba(5,5,6,.55) 36%,rgba(5,5,6,.92) 70%)}
+  .hero::before{background:linear-gradient(180deg,rgba(5,5,6,0) 0%,rgba(5,5,6,.25) 45%,rgba(5,5,6,.55) 80%)}
   .hero-ctas .btn{flex:1 1 100%}
   .hl{font-size:10px;letter-spacing:.18em;margin-top:26px}
   .hero-sig{display:none}
-  .hero.has-photo{align-items:flex-start;padding-top:max(34vh,175px);padding-top:max(34svh,175px);padding-bottom:110px}
-  .hero-lion{left:0;width:100%;bottom:auto;height:58vh;height:58svh}
-  .hero-lion{-webkit-mask-image:radial-gradient(ellipse 85% 70% at 50% 40%,#000 35%,transparent 78%);mask-image:radial-gradient(ellipse 85% 70% at 50% 40%,#000 35%,transparent 78%)}
-  .hero-lion img{object-position:50% 40%}
   .glass,.btn-ghost,.v-lock{}
   .glass{background:linear-gradient(180deg,rgba(24,23,22,.92),rgba(12,12,14,.94))}
   .svc-grid,.price-grid,.team-grid{grid-template-columns:1fr}
@@ -879,7 +865,6 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
 <!-- ============ HOME ============ -->
 <section class="page" id="page-home" data-page="home" aria-label="Home">
   <div class="hero">
-    <div class="hero-lion" id="heroLion" aria-hidden="true"><div class="hl-move"><img id="lionImg" alt="" decoding="async" fetchpriority="high" src="https://images.unsplash.com/photo-1697638332466-16f48f835b96?auto=format&amp;fit=crop&amp;crop=faces,entropy&amp;q=65&amp;w=1200&amp;h=1300" srcset="https://images.unsplash.com/photo-1697638332466-16f48f835b96?auto=format&amp;fit=crop&amp;crop=faces,entropy&amp;q=65&amp;w=720&amp;h=900 720w, https://images.unsplash.com/photo-1697638332466-16f48f835b96?auto=format&amp;fit=crop&amp;crop=faces,entropy&amp;q=65&amp;w=1200&amp;h=1300 1200w, https://images.unsplash.com/photo-1697638332466-16f48f835b96?auto=format&amp;fit=crop&amp;crop=faces,entropy&amp;q=65&amp;w=1600&amp;h=1700 1600w" sizes="(max-width: 760px) 100vw, 58vw" width="1200" height="1300"></div><div class="hl-sweep"></div></div>
     <div class="wrap">
       <div class="hero-copy">
         <div class="hero-kicker label" data-r style="--d:0s">MJR LION AGENCY — Your Success Our Pride</div>
@@ -1167,11 +1152,7 @@ window.SITE_CONFIG = {
   IMAGE_POS: { 'svc-web-development': '70% 50%', 'svc-social-media-management': '66% 45%', 'svc-performance-marketing': { card: '50% 45%', detail: '92% 45%' }, 'svc-graphic-design': { card: '55% 45%', detail: '64% 45%' }, 'svc-video-editing': { card: '45% 45%', detail: '62% 45%' }, 'svc-ai-videos': { card: '50% 40%', detail: '64% 40%' }, 'svc-ugc-production': { card: '45% 40%', detail: '36% 40%' }, 'svc-content-writing': { card: '50% 40%', detail: '62% 40%' }, 'svc-lead-generation': { card: '50% 35%', detail: '50% 40%' }, 'svc-ai-content-creation': { card: '50% 40%', detail: '60% 40%' } },
   TEAM_PHOTOS: { mjr: '', sana: '', roma: '', wasi: '', wahab: '', husnain: '', jamshaid: '' },
   /* MJR showreel — add video URLs (mp4/webm) to play real edits in the profile */
-  SHOWREEL: ['', '', '', '', '', ''],
-  /* Home page lion photo (Unsplash License — photo by Rod Long, unsplash.com/@rodlong).
-     It is set directly on <img id="lionImg"> in src/index.html so it starts downloading instantly;
-     if it fails to load, the 3D gold lion shows instead. */
-  HERO_LION: 'https://images.unsplash.com/photo-1697638332466-16f48f835b96'
+  SHOWREEL: ['', '', '', '', '', '']
 };
 
 const faq = (name, howLong, included, tools) => [
@@ -1980,7 +1961,7 @@ window.CONTACT = {
 
   const VS = `
 attribute vec3 aFrom, aTo, aCF, aCT, aEF, aET; attribute float aR;
-uniform mat4 uP, uV, uM; uniform float uT, uMorph, uPx, uOpacity, uBreath, uScatter, uWave;
+uniform mat4 uP, uV, uM; uniform float uT, uMorph, uPx, uOpacity, uBreath, uScatter, uWave, uBurst, uMaxPt;
 varying vec3 vC; varying float vA;
 void main(){
   float m = clamp(uMorph*1.55 - aR*.55, 0., 1.);
@@ -1989,6 +1970,8 @@ void main(){
   vec3 e = mix(aEF, aET, m);
   float mid = sin(m*3.14159);
   p += vec3(sin(aR*41. + uT*.7), cos(aR*29. + uT*.6), sin(aR*23. + 1.7)) * mid * .55 * uScatter;
+  // leap burst: particles fly outward past the viewer, then gather back into the lion
+  p += (normalize(p + vec3(.001, .002, .003)) * (.6 + aR * 1.6) + vec3(sin(aR*91.), cos(aR*57.), sin(aR*33.)) * .7) * uBurst;
   float w = e.z * uWave;
   p.x += sin(uT*1.15 + aR*6.283 + p.y*2.1) * .03 * w;
   p.y += cos(uT*.95 + aR*6.283 + p.x*2.3) * .03 * w;
@@ -1997,7 +1980,7 @@ void main(){
   vec4 mv = uV * uM * vec4(p, 1.);
   gl_Position = uP * mv;
   float glow = e.y * (.72 + .28*sin(uT*2.1 + aR*3.));
-  gl_PointSize = max(1., e.x * (1. + glow*.9) * uPx * (7. / -mv.z));
+  gl_PointSize = clamp(e.x * (1. + glow*.9) * uPx * (7. / -mv.z), 1., uMaxPt);
   vC = mix(aCF, aCT, m) + glow * vec3(.45, .28, .06);
   float tw = .78 + .22 * sin(uT*2.6 + aR*57.);
   float depth = clamp(1.25 - (-mv.z - 5.5) * .16, .25, 1.15);
@@ -2022,7 +2005,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     gl.useProgram(prog);
     const A = {}, U = {};
     ['aFrom', 'aTo', 'aCF', 'aCT', 'aEF', 'aET', 'aR'].forEach(n => A[n] = gl.getAttribLocation(prog, n));
-    ['uP', 'uV', 'uM', 'uT', 'uMorph', 'uPx', 'uOpacity', 'uBreath', 'uScatter', 'uWave'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+    ['uP', 'uV', 'uM', 'uT', 'uMorph', 'uPx', 'uOpacity', 'uBreath', 'uScatter', 'uWave', 'uBurst', 'uMaxPt'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
     const cache = {}, waiting = {};
     let pending = null;
@@ -2072,7 +2055,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       spin: 0, spinSpeed: 0, spinTarget: 0, lion: false,
       mx: 0, my: 0, tmx: 0, tmy: 0, scroll: 0, scrollFade: 1, time: 0, scatter: 1,
       dpr: opts.lowPower ? 1 : Math.min(window.devicePixelRatio || 1, mobile ? 1.3 : 1.5), w: 1, h: 1, last: performance.now(), dirty: true,
-      skip: 0, lowPower: !!opts.lowPower, paused: false, fN: 0, fT: 0
+      leapT: 0, skip: 0, lowPower: !!opts.lowPower, paused: false, fN: 0, fT: 0
     };
 
     function currentBlend() {
@@ -2096,6 +2079,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       o = o || {};
       if (place) Object.assign(st.tgt, place);
       st.lion = name === 'lion';
+      st.leapT = 1.6;                                   // first leap ~3s after the lion has formed
       st.spinSpeed = (place && place.spin != null) ? place.spin : (st.lion ? 0 : .14);
       if (name === st.shape) { pending = null; st.dirty = true; return; }
       if (!cache[name]) { request(name); pending = { name, place, o }; st.dirty = true; return; }   // morph starts as soon as the worker delivers it
@@ -2164,16 +2148,31 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       bind(dust);
       gl.uniformMatrix4fv(U.uM, false, model(0, st.scroll * .0012, 0, 0, st.time * .012 + st.mx * .05, 0, 1));
       gl.uniform1f(U.uMorph, 1); gl.uniform1f(U.uOpacity, .55); gl.uniform1f(U.uBreath, 0); gl.uniform1f(U.uScatter, 0); gl.uniform1f(U.uWave, reduced ? 0 : 3);
+      gl.uniform1f(U.uBurst, 0); gl.uniform1f(U.uMaxPt, 14 * st.dpr);
       gl.drawArrays(gl.POINTS, 0, dust.n);
 
       // main sculpture
       bind(main);
+      // lion leap: idle → crouch → jump at the screen → burst past the viewer → re-forms in the distance
+      let LZ = 0, LY = 0, LX = 0, LO = 1, LB = 0;
+      if (st.lion && st.morph >= 1 && !reduced) {
+        if (st.scroll < st.h * .5) st.leapT += dt;
+        const P = 9.5, t = st.leapT % P, sm = k => k * k * (3 - 2 * k);
+        if (t >= 4.6 && t < 5.4) { const k = sm((t - 4.6) / .8); LZ = -.9 * k; LY = -.18 * k; LX = .16 * k; }
+        else if (t >= 5.4 && t < 6.35) {                                   // the jump: accelerates straight at the viewer
+          const k = (t - 5.4) / .95, e = k * k * (1.2 - .2 * k);
+          LZ = -.9 + 5.5 * e; LY = -.18 + Math.sin(Math.PI * k) * .5; LX = .16 - .45 * k;
+          LO = k < .7 ? 1 + .25 * k : 1.18 - (k - .7) / .3 * 1.0; LB = k < .62 ? 0 : (k - .62) / .38 * 1.5;
+        } else if (t >= 6.35 && t < 6.8) { LZ = 4.6; LO = .18 * (1 - (t - 6.35) / .45); LB = 1.5; }
+        else if (t >= 6.8 && t < 8.8) { const k = sm((t - 6.8) / 2); LZ = -4 * (1 - k); LO = k; LB = 1.5 * (1 - k); }
+      }
       const sway = st.lion ? Math.sin(st.time * .32) * .13 : 0;
       const ry = st.spin + sway + st.mx * (st.lion ? .32 : .2) + (st.lion ? 0 : st.scroll * .0007);
-      const rx = st.cur.tilt + st.my * (st.lion ? .16 : .12) + (st.lion ? Math.sin(st.time * .21) * .03 + Math.min(.35, st.scroll * .00025) : 0);
-      gl.uniformMatrix4fv(U.uM, false, model(st.cur.x, st.cur.y + st.scroll * .0009, 0, rx, ry, 0, st.cur.s));
+      const rx = st.cur.tilt + st.my * (st.lion ? .16 : .12) + LX + (st.lion ? Math.sin(st.time * .21) * .03 + Math.min(.35, st.scroll * .00025) : 0);
+      gl.uniformMatrix4fv(U.uM, false, model(st.cur.x * (1 - Math.max(0, LZ) / 5), st.cur.y + LY + st.scroll * .0009, LZ, rx, ry, 0, st.cur.s));
+      gl.uniform1f(U.uBurst, LB);
       gl.uniform1f(U.uMorph, st.morph);
-      gl.uniform1f(U.uOpacity, st.cur.o * st.scrollFade);
+      gl.uniform1f(U.uOpacity, st.cur.o * st.scrollFade * LO);
       gl.uniform1f(U.uBreath, st.lion && !reduced ? 1 : .3);
       gl.uniform1f(U.uScatter, reduced ? 0 : st.scatter);
       gl.uniform1f(U.uWave, reduced ? 0 : 1);
@@ -2240,28 +2239,15 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
   function placement(name) {
     const aspect = window.innerWidth / window.innerHeight, halfW = 2.41 * aspect, P = PAGES[name];
     if (isMobile()) {
-      return name === 'home' ? { x: 0, y: 2.41 * .54 - (aspect > .6 ? .2 : 0), s: Math.min(.5, halfW * .34), o: .9, tilt: 0 } : { x: halfW * .2, y: 1.25, s: Math.min(.55, halfW * .42), o: .32, tilt: P.tilt || 0 };
+      return name === 'home' ? { x: 0, y: .3, s: Math.min(.6, halfW * .5), o: 1.15, tilt: 0 } : { x: halfW * .2, y: 1.25, s: Math.min(.55, halfW * .42), o: .32, tilt: P.tilt || 0 };
     }
-    if (name === 'home') return { x: Math.min(2.05, halfW * .44), y: -.05, s: .86, o: 1, tilt: 0 };
+    if (name === 'home') return { x: Math.min(1.25, halfW * .22), y: -.05, s: 1, o: 1.05, tilt: 0 };   // behind the headline, medium opacity
     if (name === 'team' || name === 'track') return { x: Math.min(3.4, halfW * .78), y: .2, s: .78, o: .38, tilt: P.tilt || 0 };
     return { x: Math.min(2.7, halfW * .6), y: .1, s: .8, o: name === 'pricing' ? .42 : .55, tilt: P.tilt || 0 };
   }
 
-  /* ------------------------------------------------------------ hero lion photo */
-  const heroLion = $('#heroLion'), lionImg = $('#lionImg');
-  let lionPhoto = false;
-  const shapeFor = n => n === 'home' ? (lionPhoto ? 'embers' : 'lion') : PAGES[n].shape;
-  if (heroLion && lionImg && lionImg.getAttribute('src')) {
-    // the photo is requested straight from the HTML (starts downloading before any script runs)
-    const ok = () => {
-      if (lionPhoto) return;
-      lionPhoto = true; heroLion.classList.add('on'); heroLion.parentElement.classList.add('has-photo');
-      if (gl3d && current === 'home') gl3d.go('embers', placement('home'), { duration: 1.6 });
-    };
-    lionImg.onload = ok;
-    lionImg.onerror = () => { heroLion.remove(); };
-    if (lionImg.complete) { if (lionImg.naturalWidth) ok(); else heroLion.remove(); }
-  } else if (heroLion) heroLion.remove();
+  /* home: animated 3D particle lion behind the headline (jumps toward the screen every few seconds) */
+  const shapeFor = n => PAGES[n].shape;
 
   /* ------------------------------------------------------------ text split */
   function split(el) {
@@ -3016,23 +3002,11 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
   function onScroll() {
     const y = scrollY;
     hdr.classList.toggle('solid', y > 30);
-    if (heroLion && current === 'home' && y < innerHeight * 1.5) heroLion.style.setProperty('--sy', (y * .22).toFixed(1));
     if (gl3d) gl3d.scroll(y, Math.max(current === 'home' ? .3 : .45, 1 - y / (innerHeight * 1.5)));
   }
   let scrollQueued = false;
   addEventListener('scroll', () => { if (scrollQueued) return; scrollQueued = true; requestAnimationFrame(() => { scrollQueued = false; onScroll(); }); }, { passive: true });
   addEventListener('resize', () => { if (gl3d && current) gl3d.place(placement(current)); });
-  let px = 0, py = 0, ptrQueued = false;
-  if (fine && !reduced && heroLion) addEventListener('pointermove', e => {
-    px = e.clientX; py = e.clientY;
-    if (ptrQueued || current !== 'home' || !heroLion.isConnected) return;
-    ptrQueued = true;
-    requestAnimationFrame(() => {
-      ptrQueued = false;
-      heroLion.style.setProperty('--lx', ((px / innerWidth - .5) * -18).toFixed(1) + 'px');
-      heroLion.style.setProperty('--ly', ((py / innerHeight - .5) * -12).toFixed(1) + 'px');
-    });
-  }, { passive: true });
 
   /* ------------------------------------------------------------ intro */
   const big = $('#introBig');
@@ -3056,7 +3030,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     addEventListener('keydown', function k(e) { if (e.key === 'Enter' || e.key === ' ') { endIntro(); removeEventListener('keydown', k); } });
   }
   // build every 3D sculpture in the background worker so page switches never stutter
-  if (gl3d) gl3d.prewarm(['embers', 'lion', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe']);
+  if (gl3d) gl3d.prewarm(['lion', 'geodesic', 'bars', 'vault', 'knot', 'helix', 'globe']);
   enhance($('#ftr'));
   onScroll();
   window.__mjrReady = true;

@@ -18,11 +18,7 @@ window.SITE_CONFIG = {
   IMAGE_POS: { 'svc-web-development': '70% 50%', 'svc-social-media-management': '66% 45%', 'svc-performance-marketing': { card: '50% 45%', detail: '92% 45%' }, 'svc-graphic-design': { card: '55% 45%', detail: '64% 45%' }, 'svc-video-editing': { card: '45% 45%', detail: '62% 45%' }, 'svc-ai-videos': { card: '50% 40%', detail: '64% 40%' }, 'svc-ugc-production': { card: '45% 40%', detail: '36% 40%' }, 'svc-content-writing': { card: '50% 40%', detail: '62% 40%' }, 'svc-lead-generation': { card: '50% 35%', detail: '50% 40%' }, 'svc-ai-content-creation': { card: '50% 40%', detail: '60% 40%' } },
   TEAM_PHOTOS: { mjr: '', sana: '', roma: '', wasi: '', wahab: '', husnain: '', jamshaid: '' },
   /* MJR showreel — add video URLs (mp4/webm) to play real edits in the profile */
-  SHOWREEL: ['', '', '', '', '', ''],
-  /* Home page lion photo (Unsplash License — photo by Rod Long, unsplash.com/@rodlong).
-     It is set directly on <img id="lionImg"> in src/index.html so it starts downloading instantly;
-     if it fails to load, the 3D gold lion shows instead. */
-  HERO_LION: 'https://images.unsplash.com/photo-1697638332466-16f48f835b96'
+  SHOWREEL: ['', '', '', '', '', '']
 };
 
 const faq = (name, howLong, included, tools) => [
