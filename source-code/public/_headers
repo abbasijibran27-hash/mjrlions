@@ -13,3 +13,10 @@
 
 /images/*
   Cache-Control: public, max-age=31536000, immutable
+
+# always check for the newest version of the page (updates show immediately)
+/
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
