@@ -198,7 +198,7 @@ window.PRICING = [
 
 window.CONTACT = {
   emails: ['mjrlionagency.com', 'mjrlioncomolain.com'],
-  helpline: ['+92 302 8939864', '+92 315 0057588'],
+  helpline: ['+44 788867406', '+92 302 8939864', '+92 315 0057588'],
   complaints: ['+92 316 5495681'],
   whatsapp: '923028939864'
 };
