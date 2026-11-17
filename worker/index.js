@@ -54,7 +54,7 @@ const ipOf = r => r.headers.get('cf-connecting-ip') || 'unknown';
 
 /* ---------------------------------------------------------------- team verify + project tracking */
 function normalise(raw, prefix) {
-  let c = String(raw || '').toUpperCase().replace(/[\s_]+/g, '').replace(/[–—]/g, '-').slice(0, 24);
+  let c = String(raw || '').toUpperCase().replace(/[\s_()[\]{}]+/g, '').replace(/[–—]/g, '-').slice(0, 24);
   const bare = prefix.replace(/-/g, '');
   if (/^\d{5}$/.test(c)) c = prefix + c;
   if (c.startsWith(bare) && /^\d{5}$/.test(c.slice(bare.length))) c = prefix + c.slice(bare.length);

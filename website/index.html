@@ -2656,7 +2656,7 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
   }
   const API_ERR = { rate: 'Too many attempts from this connection. Please wait 10 minutes and try again.', setup: 'Verification is being set up. Please try again shortly.', offline: 'Can’t reach the secure server right now. Check your connection and try again.' };
   function norm(raw, prefix) {
-    let c = raw.toUpperCase().replace(/[\s_]+/g, '').replace(/[–—]/g, '-');
+    let c = raw.toUpperCase().replace(/[\s_()[\]{}]+/g, '').replace(/[–—]/g, '-');
     if (/^\d{5}$/.test(c)) c = prefix + c;
     const bare = prefix.replace(/-/g, '');
     if (c.startsWith(bare) && /^\d{5}$/.test(c.slice(bare.length))) c = prefix + c.slice(bare.length);
