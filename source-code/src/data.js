@@ -199,5 +199,9 @@ window.PRICING = [
 window.CONTACT = {
   emails: ['mjrlionagency.com', 'mjrlioncomolain.com'],
   helpline: ['+44 7888 670406'],
-  complaints: ['+44 7888 670406']
+  complaints: ['+44 7888 670406'],
+  // social accounts — add more as { name, handle, url }; only the ones listed here show on the site
+  social: [
+    { name: 'Instagram', handle: '@mjrlionofficial', url: 'https://www.instagram.com/mjrlionofficial/' }
+  ]
 };

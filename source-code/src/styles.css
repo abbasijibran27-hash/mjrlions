@@ -637,6 +637,18 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
 .ln-note{display:block;color:#cfc9bd;font-size:13.5px;margin-top:3px}
 
 /* ---------- CONTACT */
+/* social accounts */
+.soc-row{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-top:18px;padding:20px 26px;border-radius:22px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(22,21,20,.7),rgba(10,10,12,.75))}
+.soc-row[hidden]{display:none}
+.soc{display:flex;gap:10px;flex-wrap:wrap}
+.soc-pill{display:inline-flex;align-items:center;gap:10px;padding:11px 16px;border-radius:999px;border:1px solid var(--line3);background:rgba(0,0,0,.3);font:600 13px/1 var(--fb);color:#efe9dc;transition:border-color .3s,background .3s,transform .3s var(--ease)}
+.soc-pill .soc-h{color:var(--muted);font-weight:500}
+.soc-pill .arr{color:var(--gold2);transition:transform .3s var(--ease)}
+.soc-pill:hover{border-color:var(--gold);background:rgba(214,178,110,.08);transform:translateY(-2px)}
+.soc-pill:hover .arr{transform:translate(2px,-2px)}
+.soc-pill:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+.ftr-brand .soc{margin-top:4px}
+@media (max-width:560px){.soc-row{padding:18px 18px}.soc-pill{padding:10px 14px}}
 .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .c-card{padding:28px;border-radius:22px;display:grid;gap:12px;align-content:start;background:linear-gradient(180deg,rgba(24,23,21,.86),rgba(10,10,12,.92));border:1px solid var(--line2)}
 .c-card:hover{border-color:rgba(214,178,110,.45)}

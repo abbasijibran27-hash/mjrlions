@@ -248,6 +248,13 @@
     { i: 'alert', l: 'Complaints', v: C.complaints.map(tel).join('<br>') }
   ].map((c, i) => `<div class="c-card tilt" data-r style="--d:${i * .08}s"><div class="c-ico z2">${VIS.icon(c.i)}</div><div class="label z1">${c.l}</div><div class="v z2">${c.v}</div>${c.i === 'alert' ? '<button class="btn btn-ghost btn-sm c-act z2" type="button" data-complaint>File a Complaint <span class="arr">→</span></button>' : ''}</div>`).join('');
   $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(mail).join('<br>')}</div>`;
+  const SOC = (C.social || []).filter(s => s && /^https:\/\//.test(s.url));
+  const socPill = s => `<a class="soc-pill" href="${esc(s.url)}" target="_blank" rel="noopener me" aria-label="${esc(s.name)} ${esc(s.handle || '')} (opens in a new tab)"><span class="soc-n">${esc(s.name)}</span>${s.handle ? `<span class="soc-h">${esc(s.handle)}</span>` : ''}<span class="arr" aria-hidden="true">↗</span></a>`;
+  if (SOC.length) {
+    const sr = $('#socRow'); sr.hidden = false;
+    sr.innerHTML = `<div class="label">Follow MJR Lion</div><div class="soc">${SOC.map(socPill).join('')}</div>`;
+    $('#ftrSoc').innerHTML = SOC.map(socPill).join('');
+  }
   $('#vLockIco').innerHTML = VIS.icon('lock'); $('#tLockIco').innerHTML = VIS.icon('key');
   /* ---------- project / complaint form (contact page + popup everywhere) */
   const SVC_OPTS = SERVICES.map(s => s.name).concat(['All-in-One Standard Brand Program', 'All-in-One Premium Brand Program', 'Not sure yet — advise me']);

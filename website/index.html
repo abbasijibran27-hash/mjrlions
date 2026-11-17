@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"ProfessionalService","name":"MJR LION AGENCY","alternateName":"MJR Lion Agency","slogan":"Your Success Our Pride","description":"International premium digital agency — premium websites, branding, AI-powered marketing, content creation and performance-driven digital strategies.","url":"https://mjrlion.studio/","telephone":"+44 7888 670406","areaServed":["United Kingdom","United States","Pakistan","Worldwide"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Digital services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Web Development"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":699,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Social Media Management"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":599,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Performance Marketing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Graphic Design"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":250,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Video Editing"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":200,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Videos"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"UGC Production"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Content Writing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lead Generation"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Content Creation"}}]}}
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"MJR LION AGENCY","alternateName":"MJR Lion Agency","slogan":"Your Success Our Pride","description":"International premium digital agency — premium websites, branding, AI-powered marketing, content creation and performance-driven digital strategies.","url":"https://mjrlion.studio/","sameAs":["https://www.instagram.com/mjrlionofficial/"],"telephone":"+44 7888 670406","areaServed":["United Kingdom","United States","Pakistan","Worldwide"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Digital services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Web Development"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":699,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Social Media Management"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":599,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Performance Marketing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Graphic Design"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":250,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Video Editing"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":200,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Videos"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"UGC Production"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Content Writing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lead Generation"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Content Creation"}}]}}
 </script>
 <style>/* =========================================================================
    MJR LION AGENCY — design system
@@ -665,6 +665,18 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
 .ln-note{display:block;color:#cfc9bd;font-size:13.5px;margin-top:3px}
 
 /* ---------- CONTACT */
+/* social accounts */
+.soc-row{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-top:18px;padding:20px 26px;border-radius:22px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(22,21,20,.7),rgba(10,10,12,.75))}
+.soc-row[hidden]{display:none}
+.soc{display:flex;gap:10px;flex-wrap:wrap}
+.soc-pill{display:inline-flex;align-items:center;gap:10px;padding:11px 16px;border-radius:999px;border:1px solid var(--line3);background:rgba(0,0,0,.3);font:600 13px/1 var(--fb);color:#efe9dc;transition:border-color .3s,background .3s,transform .3s var(--ease)}
+.soc-pill .soc-h{color:var(--muted);font-weight:500}
+.soc-pill .arr{color:var(--gold2);transition:transform .3s var(--ease)}
+.soc-pill:hover{border-color:var(--gold);background:rgba(214,178,110,.08);transform:translateY(-2px)}
+.soc-pill:hover .arr{transform:translate(2px,-2px)}
+.soc-pill:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+.ftr-brand .soc{margin-top:4px}
+@media (max-width:560px){.soc-row{padding:18px 18px}.soc-pill{padding:10px 14px}}
 .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .c-card{padding:28px;border-radius:22px;display:grid;gap:12px;align-content:start;background:linear-gradient(180deg,rgba(24,23,21,.86),rgba(10,10,12,.92));border:1px solid var(--line2)}
 .c-card:hover{border-color:rgba(214,178,110,.45)}
@@ -1142,6 +1154,7 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
   <section class="sec" style="padding-top:0">
     <div class="wrap">
       <div class="c-grid" id="cGrid"></div>
+      <div class="soc-row" id="socRow" data-r hidden></div>
       <div class="form-wrap">
         <div data-r>
           <div class="label" style="margin-bottom:20px">Project brief</div>
@@ -1165,7 +1178,7 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
       <a href="#services" class="btn btn-gold" data-mag>Start Your Project <span class="arr">→</span></a>
     </div>
     <div class="ftr-top">
-      <div class="ftr-brand"><span id="ftrMark"></span><h3>MJR LION AGENCY</h3><p>Your Success Our Pride</p></div>
+      <div class="ftr-brand"><span id="ftrMark"></span><h3>MJR LION AGENCY</h3><p>Your Success Our Pride</p><div class="soc" id="ftrSoc"></div></div>
       <div><h4>Navigate</h4><nav aria-label="Footer">
         <a href="#home">Home</a><a href="#services">Our Services</a><a href="#pricing">Pricing</a><a href="#team">Team Member</a>
         <a href="#updates">Updates</a><a href="#contact">Contact Us</a><a href="#track">Track Project</a>
@@ -1386,7 +1399,11 @@ window.PRICING = [
 window.CONTACT = {
   emails: ['mjrlionagency.com', 'mjrlioncomolain.com'],
   helpline: ['+44 7888 670406'],
-  complaints: ['+44 7888 670406']
+  complaints: ['+44 7888 670406'],
+  // social accounts — add more as { name, handle, url }; only the ones listed here show on the site
+  social: [
+    { name: 'Instagram', handle: '@mjrlionofficial', url: 'https://www.instagram.com/mjrlionofficial/' }
+  ]
 };
 
 ;
@@ -2499,6 +2516,13 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
     { i: 'alert', l: 'Complaints', v: C.complaints.map(tel).join('<br>') }
   ].map((c, i) => `<div class="c-card tilt" data-r style="--d:${i * .08}s"><div class="c-ico z2">${VIS.icon(c.i)}</div><div class="label z1">${c.l}</div><div class="v z2">${c.v}</div>${c.i === 'alert' ? '<button class="btn btn-ghost btn-sm c-act z2" type="button" data-complaint>File a Complaint <span class="arr">→</span></button>' : ''}</div>`).join('');
   $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(mail).join('<br>')}</div>`;
+  const SOC = (C.social || []).filter(s => s && /^https:\/\//.test(s.url));
+  const socPill = s => `<a class="soc-pill" href="${esc(s.url)}" target="_blank" rel="noopener me" aria-label="${esc(s.name)} ${esc(s.handle || '')} (opens in a new tab)"><span class="soc-n">${esc(s.name)}</span>${s.handle ? `<span class="soc-h">${esc(s.handle)}</span>` : ''}<span class="arr" aria-hidden="true">↗</span></a>`;
+  if (SOC.length) {
+    const sr = $('#socRow'); sr.hidden = false;
+    sr.innerHTML = `<div class="label">Follow MJR Lion</div><div class="soc">${SOC.map(socPill).join('')}</div>`;
+    $('#ftrSoc').innerHTML = SOC.map(socPill).join('');
+  }
   $('#vLockIco').innerHTML = VIS.icon('lock'); $('#tLockIco').innerHTML = VIS.icon('key');
   /* ---------- project / complaint form (contact page + popup everywhere) */
   const SVC_OPTS = SERVICES.map(s => s.name).concat(['All-in-One Standard Brand Program', 'All-in-One Premium Brand Program', 'Not sure yet — advise me']);
