@@ -584,6 +584,14 @@ main{position:relative;z-index:2;overflow-x:clip}
 .post h3{font:600 1.25rem/1.3 var(--fh);margin-top:16px;letter-spacing:-.01em;text-wrap:balance}
 .post-body{margin-top:10px;color:#ddd7cb;font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
 .post-body a{color:var(--gold2);text-decoration:underline;text-underline-offset:3px}
+.post-vid{margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:#0b0b0d;aspect-ratio:16/9}
+.post-vid video{display:block;width:100%;height:100%;object-fit:contain;background:#0b0b0d}
+.post-quotes{display:grid;gap:12px;margin-top:18px}
+.post-quotes blockquote{position:relative;margin:0;padding:16px 18px 14px 46px;border-radius:14px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(214,178,110,.07),rgba(214,178,110,.015))}
+.post-quotes blockquote::before{content:"\201C";position:absolute;left:14px;top:4px;font:600 40px/1 var(--fh);color:var(--gold)}
+.post-quotes p{font:500 15.5px/1.6 var(--fh);color:#f1ead9;font-style:italic}
+.post-quotes cite{display:block;margin-top:8px;font:600 9.5px/1 var(--fl);letter-spacing:.2em;color:var(--dim);font-style:normal}
+.post-cta{margin-top:18px}
 .post-img{margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:#0b0b0d}
 .post-img img{width:100%;height:auto;max-height:680px;object-fit:cover}
 .post-f{display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line2)}
@@ -2802,17 +2810,31 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
       ${p.title ? `<h3>${esc(p.title)}</h3>` : ''}
       ${p.body ? `<div class="post-body">${linkify(p.body)}</div>` : ''}
       ${p.img ? `<div class="post-img"><img src="/api/media/${esc(p.img)}" alt="${esc(p.title || UT[p.type] || 'Update')}" loading="lazy" decoding="async"${p.w && p.h ? ` width="${+p.w}" height="${+p.h}"` : ''}></div>` : ''}
+      ${p.video && /^\/(api\/video|media)\/[\w.-]+$/.test(p.video) ? `<div class="post-vid"><video src="${esc(p.video)}"${p.poster ? ` poster="${esc(p.poster)}"` : ''} controls muted playsinline loop preload="none"${p.w && p.h ? ` width="${+p.w}" height="${+p.h}"` : ''} aria-label="${esc(p.title || 'Video')}"></video></div>` : ''}
+      ${Array.isArray(p.quotes) && p.quotes.length ? `<div class="post-quotes">${p.quotes.map(q => `<blockquote><p>${esc(q)}</p><cite>MJR LION AGENCY</cite></blockquote>`).join('')}</div>` : ''}
+      ${p.cta ? `<div class="post-cta"><a class="btn btn-gold btn-sm" href="#contact" data-plan="">${esc(p.cta)} <span class="arr">→</span></a></div>` : ''}
       <footer class="post-f"><button type="button" data-share="${esc(p.id)}">${ICO_SHARE}Share</button>${US.me ? `<button type="button" class="del" data-del="${esc(p.id)}">${ICO_DEL}Delete</button>` : ''}</footer>
     </article>`;
   }
   function renderFilters() {
     $('#uFilters').innerHTML = [['all', 'All']].concat(Object.entries(UT)).map(([k, v]) => `<button type="button" role="tab" class="${US.f === k ? 'on' : ''}" aria-selected="${US.f === k}" data-uf="${k}">${esc(v)}</button>`).join('');
   }
+  // post videos: play silently while on screen, pause when scrolled away (tap for controls / fullscreen)
+  const vidIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting && e.intersectionRatio >= .55) { if (!v.dataset.user && !reduced && !(navigator.connection && navigator.connection.saveData)) { v.preload = 'auto'; v.play().catch(() => { }); } }
+    else if (!v.paused) v.pause();
+  }), { threshold: [0, .55] }) : null;
   function renderFeed() {
     if (!US.loaded) { feedEl.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
     const list = US.posts.filter(p => US.f === 'all' || p.type === US.f);
     feedEl.innerHTML = list.length ? list.map(postHTML).join('') :
       `<div class="feed-empty glass"><b>${US.posts.length ? 'Nothing in this category yet.' : 'No updates yet.'}</b>New offers, partnerships and announcements will appear here.</div>`;
+    $$('.post-vid video', feedEl).forEach(v => {
+      v.addEventListener('pause', () => { if (v.dataset.auto !== '1' && document.visibilityState === 'visible' && v.getBoundingClientRect().top < innerHeight && v.getBoundingClientRect().bottom > 0) v.dataset.user = '1'; });
+      v.addEventListener('play', () => { delete v.dataset.user; });
+      vidIO && vidIO.observe(v);
+    });
   }
   function renderComposer() {
     $('#adminBtn').hidden = !US.me; // admin controls are invisible to visitors

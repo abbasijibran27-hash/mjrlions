@@ -6,6 +6,7 @@
    Updates feed: GET  /api/posts            (public)
                  POST /api/posts            (owner/admin)  { type, title, body, image? }
                  DELETE /api/posts/:id      (owner/admin)
+                 GET  /api/video/:file      (official post videos, with byte-range support for iPhone/Safari)
                  GET  /api/media/:id        (public images)
    Projects:     GET|POST /api/admin/projects, GET|PUT|DELETE /api/admin/projects/:id  (owner/admin; delete = owner)
    Contact:      POST /api/contact          { type: inquiry|complaint, name, email, ... }  (public, rate-limited)
@@ -129,6 +130,36 @@ async function auth(request, env) {
 const kvOK = env => !!(env.UPDATES && env.UPDATES.get);
 async function admins(env) { return (await env.UPDATES.get('admins', 'json')) || []; }
 async function feed(env) { return (await env.UPDATES.get('feed', 'json')) || []; }
+/* official posts that ship with the site (video files live in ./website/media). Owner/admins can delete them like any post. */
+const SEED_POSTS = [{
+  id: 'official-portfolio-2026', type: 'news', title: 'MJR Lion\u2019s Official Portfolio \u2014 Edition 2026',
+  body: 'Our official portfolio is here. Watch it to see who we are, the five ways we move brands forward, the five steps every project follows, and the team behind MJR Lion\u2019s.\n\nWe work with startups, e-commerce brands and small-to-mid businesses across the United Kingdom, the United States and beyond. Have a project in mind? Tap \u201cStart Your Project\u201d and our team will reply within 24 hours.',
+  quotes: [
+    'A business doesn\u2019t grow by chance. It grows when a clear plan meets consistent action, every single day.',
+    'Your brand is a promise. Every post, every frame and every reply is your chance to keep it.',
+    'Every big brand was once a small business that refused to stay small. Your next chapter starts with one bold step.'
+  ],
+  video: '/api/video/mjr-lions-portfolio-149f4efa.mp4', poster: '/media/mjr-lions-portfolio-a820d27d.webp', w: 1440, h: 810,
+  cta: 'Start Your Project', author: 'MJR (Mr. Jibran)', atitle: 'Founder', role: 'owner', at: Date.UTC(2026, 10, 18, 9, 45)
+}];
+async function allPosts(env) {
+  const list = kvOK(env) ? await feed(env) : [];
+  const hidden = kvOK(env) ? ((await env.UPDATES.get('seed_hidden', 'json')) || []) : [];
+  return list.concat(SEED_POSTS.filter(s => !hidden.includes(s.id) && !list.some(x => x.id === s.id))).sort((a, b) => b.at - a.at);
+}
+async function video(request, env, name) {
+  if (!/^[\w-]+\.mp4$/.test(name)) return new Response('Not found', { status: 404 });
+  const src = await env.ASSETS.fetch(new Request(new URL('/media/' + name, request.url)));
+  if (!src.ok) return new Response('Not found', { status: 404 });
+  const buf = await src.arrayBuffer(), size = buf.byteLength;
+  const h = { 'content-type': 'video/mp4', 'accept-ranges': 'bytes', 'cache-control': 'public, max-age=31536000, immutable', etag: '"' + name + '"', 'x-content-type-options': 'nosniff' };
+  const m = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get('range') || '');
+  if (!m || (!m[1] && !m[2])) return new Response(request.method === 'HEAD' ? null : buf, { status: 200, headers: { ...h, 'content-length': String(size) } });
+  let start, end;
+  if (!m[1]) { start = Math.max(0, size - +m[2]); end = size - 1; } else { start = +m[1]; end = m[2] ? Math.min(+m[2], size - 1) : size - 1; }
+  if (start >= size || start > end) return new Response(null, { status: 416, headers: { ...h, 'content-range': 'bytes */' + size } });
+  return new Response(request.method === 'HEAD' ? null : buf.slice(start, end + 1), { status: 206, headers: { ...h, 'content-range': `bytes ${start}-${end}/${size}`, 'content-length': String(end - start + 1) } });
+}
 const TYPES = ['offer', 'merger', 'news', 'update', 'alert'];
 const slug = s => String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '').slice(0, 14) || 'admin';
 function genPassword() {
@@ -229,6 +260,11 @@ async function createPost(request, env, me) {
   return json({ ok: true, post });
 }
 async function deletePost(env, id) {
+  if (SEED_POSTS.some(s => s.id === id)) {
+    const hidden = (await env.UPDATES.get('seed_hidden', 'json')) || [];
+    if (!hidden.includes(id)) { hidden.push(id); await env.UPDATES.put('seed_hidden', JSON.stringify(hidden)); }
+    return json({ ok: true });
+  }
   const list = await feed(env), p = list.find(x => x.id === id);
   if (!p) return json({ ok: false, error: 'not_found' }, 404);
   await env.UPDATES.put('feed', JSON.stringify(list.filter(x => x.id !== id)));
@@ -405,9 +441,9 @@ export default {
         return await media(request, env, p.slice(11).replace(/[^\w-]/g, ''), ctx);
       }
       if (p === '/api/posts' && M === 'GET') {
-        if (!kvOK(env)) return json({ ok: true, posts: [] });
-        return json({ ok: true, posts: await feed(env) });
+        return json({ ok: true, posts: await allPosts(env) });
       }
+      if (p.startsWith('/api/video/') && (M === 'GET' || M === 'HEAD')) return await video(request, env, p.slice(11));
       if (p === '/api/admin/login' && M === 'POST') return await login(request, env);
       if (p === '/api/contact' && M === 'POST') return await contact(request, env);
       if (p === '/api/form-config' && M === 'GET') {

@@ -534,17 +534,31 @@
       ${p.title ? `<h3>${esc(p.title)}</h3>` : ''}
       ${p.body ? `<div class="post-body">${linkify(p.body)}</div>` : ''}
       ${p.img ? `<div class="post-img"><img src="/api/media/${esc(p.img)}" alt="${esc(p.title || UT[p.type] || 'Update')}" loading="lazy" decoding="async"${p.w && p.h ? ` width="${+p.w}" height="${+p.h}"` : ''}></div>` : ''}
+      ${p.video && /^\/(api\/video|media)\/[\w.-]+$/.test(p.video) ? `<div class="post-vid"><video src="${esc(p.video)}"${p.poster ? ` poster="${esc(p.poster)}"` : ''} controls muted playsinline loop preload="none"${p.w && p.h ? ` width="${+p.w}" height="${+p.h}"` : ''} aria-label="${esc(p.title || 'Video')}"></video></div>` : ''}
+      ${Array.isArray(p.quotes) && p.quotes.length ? `<div class="post-quotes">${p.quotes.map(q => `<blockquote><p>${esc(q)}</p><cite>MJR LION AGENCY</cite></blockquote>`).join('')}</div>` : ''}
+      ${p.cta ? `<div class="post-cta"><a class="btn btn-gold btn-sm" href="#contact" data-plan="">${esc(p.cta)} <span class="arr">→</span></a></div>` : ''}
       <footer class="post-f"><button type="button" data-share="${esc(p.id)}">${ICO_SHARE}Share</button>${US.me ? `<button type="button" class="del" data-del="${esc(p.id)}">${ICO_DEL}Delete</button>` : ''}</footer>
     </article>`;
   }
   function renderFilters() {
     $('#uFilters').innerHTML = [['all', 'All']].concat(Object.entries(UT)).map(([k, v]) => `<button type="button" role="tab" class="${US.f === k ? 'on' : ''}" aria-selected="${US.f === k}" data-uf="${k}">${esc(v)}</button>`).join('');
   }
+  // post videos: play silently while on screen, pause when scrolled away (tap for controls / fullscreen)
+  const vidIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting && e.intersectionRatio >= .55) { if (!v.dataset.user && !reduced && !(navigator.connection && navigator.connection.saveData)) { v.preload = 'auto'; v.play().catch(() => { }); } }
+    else if (!v.paused) v.pause();
+  }), { threshold: [0, .55] }) : null;
   function renderFeed() {
     if (!US.loaded) { feedEl.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
     const list = US.posts.filter(p => US.f === 'all' || p.type === US.f);
     feedEl.innerHTML = list.length ? list.map(postHTML).join('') :
       `<div class="feed-empty glass"><b>${US.posts.length ? 'Nothing in this category yet.' : 'No updates yet.'}</b>New offers, partnerships and announcements will appear here.</div>`;
+    $$('.post-vid video', feedEl).forEach(v => {
+      v.addEventListener('pause', () => { if (v.dataset.auto !== '1' && document.visibilityState === 'visible' && v.getBoundingClientRect().top < innerHeight && v.getBoundingClientRect().bottom > 0) v.dataset.user = '1'; });
+      v.addEventListener('play', () => { delete v.dataset.user; });
+      vidIO && vidIO.observe(v);
+    });
   }
   function renderComposer() {
     $('#adminBtn').hidden = !US.me; // admin controls are invisible to visitors
