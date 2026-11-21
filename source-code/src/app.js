@@ -242,12 +242,14 @@
   const C = window.CONTACT;
   const tel = n => `<a href="tel:${n.replace(/\s/g, '')}">${esc(n)}</a>`;
   const mail = m => m.includes('@') ? `<a href="mailto:${esc(m)}">${esc(m)}</a>` : esc(m);
+  const mailW = m => m.includes('@') ? `<a href="mailto:${esc(m)}">${esc(m).replace('@', '@<wbr>')}</a>` : esc(m);   // long addresses wrap after the @ only
+  const emLine = e => typeof e === 'string' ? `<div class="em-line">${mailW(e)}</div>` : `<div class="em-line"><small>${esc(e.l)}</small>${mailW(e.v)}</div>`;
   $('#cGrid').innerHTML = [
-    { i: 'mail', l: 'Email', v: C.emails.map(mail).join('<br>') },
+    { i: 'mail', l: 'Email', v: C.emails.map(emLine).join('') },
     { i: 'phone', l: 'Helpline', v: C.helpline.map(tel).join('<br>') },
     { i: 'alert', l: 'Complaints', v: C.complaints.map(tel).join('<br>') }
   ].map((c, i) => `<div class="c-card tilt" data-r style="--d:${i * .08}s"><div class="c-ico z2">${VIS.icon(c.i)}</div><div class="label z1">${c.l}</div><div class="v z2">${c.v}</div>${c.i === 'alert' ? '<button class="btn btn-ghost btn-sm c-act z2" type="button" data-complaint>File a Complaint <span class="arr">→</span></button>' : ''}</div>`).join('');
-  $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(mail).join('<br>')}</div>`;
+  $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(emLine).join('')}</div>`;
   const SOC = (C.social || []).filter(s => s && /^https:\/\//.test(s.url));
   const socPill = s => `<a class="soc-pill" href="${esc(s.url)}" target="_blank" rel="noopener me" aria-label="${esc(s.name)} ${esc(s.handle || '')} (opens in a new tab)"><span class="soc-n">${esc(s.name)}</span>${s.handle ? `<span class="soc-h">${esc(s.handle)}</span>` : ''}<span class="arr" aria-hidden="true">↗</span></a>`;
   if (SOC.length) {

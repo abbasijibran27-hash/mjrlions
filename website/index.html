@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"ProfessionalService","name":"MJR LION AGENCY","alternateName":"MJR Lion Agency","slogan":"Your Success Our Pride","description":"International premium digital agency — premium websites, branding, AI-powered marketing, content creation and performance-driven digital strategies.","url":"https://mjrlion.studio/","sameAs":["https://www.instagram.com/mjrlionofficial/"],"telephone":"+44 7888 670406","areaServed":["United Kingdom","United States","Pakistan","Worldwide"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Digital services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Web Development"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":699,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Social Media Management"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":599,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Performance Marketing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Graphic Design"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":250,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Video Editing"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":200,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Videos"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"UGC Production"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Content Writing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lead Generation"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Content Creation"}}]}}
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"MJR LION AGENCY","alternateName":"MJR Lion Agency","slogan":"Your Success Our Pride","description":"International premium digital agency — premium websites, branding, AI-powered marketing, content creation and performance-driven digital strategies.","url":"https://mjrlion.studio/","sameAs":["https://www.instagram.com/mjrlionofficial/"],"telephone":"+44 7888 670406","email":"info.inquirymjrservices@gmail.com","areaServed":["United Kingdom","United States","Pakistan","Worldwide"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Digital services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Web Development"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":699,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Social Media Management"},"priceSpecification":{"@type":"PriceSpecification","minPrice":499,"maxPrice":599,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Performance Marketing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Graphic Design"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":250,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Video Editing"},"priceSpecification":{"@type":"PriceSpecification","minPrice":120,"maxPrice":200,"priceCurrency":"USD"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Videos"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"UGC Production"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Content Writing"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lead Generation"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"AI Content Creation"}}]}}
 </script>
 <style>/* =========================================================================
    MJR LION AGENCY — design system
@@ -685,6 +685,11 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
 .soc-pill:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
 .ftr-brand .soc{margin-top:4px}
 @media (max-width:560px){.soc-row{padding:18px 18px}.soc-pill{padding:10px 14px}}
+.em-line{display:grid;gap:2px;margin-bottom:10px;min-width:0}
+.em-line:last-child{margin-bottom:0}
+.em-line small{font:600 9.5px/1.4 var(--fl);letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.em-line a{overflow-wrap:normal;word-break:normal}
+.c-card .em-line a{font-size:clamp(14.5px,1.12vw,16.5px)}
 .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .c-card{padding:28px;border-radius:22px;display:grid;gap:12px;align-content:start;background:linear-gradient(180deg,rgba(24,23,21,.86),rgba(10,10,12,.92));border:1px solid var(--line2)}
 .c-card:hover{border-color:rgba(214,178,110,.45)}
@@ -1405,7 +1410,11 @@ window.PRICING = [
 ];
 
 window.CONTACT = {
-  emails: ['mjrlionagency.com', 'mjrlioncomolain.com'],
+  // official emails: services & inquiries / complaints
+  emails: [
+    { l: 'Services & Inquiries', v: 'info.inquirymjrservices@gmail.com' },
+    { l: 'Complaints', v: 'info.mjrcomplaint@gmail.com' }
+  ],
   helpline: ['+44 7888 670406'],
   complaints: ['+44 7888 670406'],
   // social accounts — add more as { name, handle, url }; only the ones listed here show on the site
@@ -2518,12 +2527,14 @@ void main(){ vec2 c = gl_PointCoord - .5; float d = length(c); float a = smooths
   const C = window.CONTACT;
   const tel = n => `<a href="tel:${n.replace(/\s/g, '')}">${esc(n)}</a>`;
   const mail = m => m.includes('@') ? `<a href="mailto:${esc(m)}">${esc(m)}</a>` : esc(m);
+  const mailW = m => m.includes('@') ? `<a href="mailto:${esc(m)}">${esc(m).replace('@', '@<wbr>')}</a>` : esc(m);   // long addresses wrap after the @ only
+  const emLine = e => typeof e === 'string' ? `<div class="em-line">${mailW(e)}</div>` : `<div class="em-line"><small>${esc(e.l)}</small>${mailW(e.v)}</div>`;
   $('#cGrid').innerHTML = [
-    { i: 'mail', l: 'Email', v: C.emails.map(mail).join('<br>') },
+    { i: 'mail', l: 'Email', v: C.emails.map(emLine).join('') },
     { i: 'phone', l: 'Helpline', v: C.helpline.map(tel).join('<br>') },
     { i: 'alert', l: 'Complaints', v: C.complaints.map(tel).join('<br>') }
   ].map((c, i) => `<div class="c-card tilt" data-r style="--d:${i * .08}s"><div class="c-ico z2">${VIS.icon(c.i)}</div><div class="label z1">${c.l}</div><div class="v z2">${c.v}</div>${c.i === 'alert' ? '<button class="btn btn-ghost btn-sm c-act z2" type="button" data-complaint>File a Complaint <span class="arr">→</span></button>' : ''}</div>`).join('');
-  $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(mail).join('<br>')}</div>`;
+  $('#ftrContact').innerHTML = `<div><span>Helpline</span>${C.helpline.map(tel).join('<br>')}</div><div><span>Complaints</span>${tel(C.complaints[0])}</div><div><span>Email</span>${C.emails.map(emLine).join('')}</div>`;
   const SOC = (C.social || []).filter(s => s && /^https:\/\//.test(s.url));
   const socPill = s => `<a class="soc-pill" href="${esc(s.url)}" target="_blank" rel="noopener me" aria-label="${esc(s.name)} ${esc(s.handle || '')} (opens in a new tab)"><span class="soc-n">${esc(s.name)}</span>${s.handle ? `<span class="soc-h">${esc(s.handle)}</span>` : ''}<span class="arr" aria-hidden="true">↗</span></a>`;
   if (SOC.length) {

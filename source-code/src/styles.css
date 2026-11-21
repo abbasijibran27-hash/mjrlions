@@ -657,6 +657,11 @@ textarea.fi{min-height:120px;resize:vertical;line-height:1.6}
 .soc-pill:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
 .ftr-brand .soc{margin-top:4px}
 @media (max-width:560px){.soc-row{padding:18px 18px}.soc-pill{padding:10px 14px}}
+.em-line{display:grid;gap:2px;margin-bottom:10px;min-width:0}
+.em-line:last-child{margin-bottom:0}
+.em-line small{font:600 9.5px/1.4 var(--fl);letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.em-line a{overflow-wrap:normal;word-break:normal}
+.c-card .em-line a{font-size:clamp(14.5px,1.12vw,16.5px)}
 .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .c-card{padding:28px;border-radius:22px;display:grid;gap:12px;align-content:start;background:linear-gradient(180deg,rgba(24,23,21,.86),rgba(10,10,12,.92));border:1px solid var(--line2)}
 .c-card:hover{border-color:rgba(214,178,110,.45)}
