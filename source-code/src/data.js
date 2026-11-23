@@ -199,7 +199,7 @@ window.PRICING = [
 window.CONTACT = {
   // official emails: services & inquiries / complaints
   emails: [
-    { l: 'Services & Inquiries', v: 'info.inquirymjrservices@gmail.com' },
+    { l: 'Services & Inquiries', v: 'info.inquirymjrservice@gmail.com' },
     { l: 'Complaints', v: 'info.mjrcomplaint@gmail.com' }
   ],
   helpline: ['+44 7888 670406'],
